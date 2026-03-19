@@ -43,12 +43,14 @@ export PATH="$PATH:$HOME/.lmstudio/bin"
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
 
-# ${UserConfigDir}/zsh/.zshrc
+# carapace
 autoload -U compinit && compinit
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 source <(carapace _carapace)
 
+# zoxide
+eval "$(zoxide init zsh)"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
