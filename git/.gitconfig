@@ -1,7 +1,17 @@
 # This is Git's per-user configuration file.
 [user]
-# Please adapt and uncomment the following lines:
-	name = Joshua Sargent
-	email = josh@joshuasargent.com
+  name = Joshua Sargent
+  email = josh@joshuasargent.com
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICNOvO3AW8aSyOLvXw0roQ6F303TThjK6z2XYoOlNQD9
+
 [core]
-	excludesfile = ~/.gitignore
+  excludesfile = ~/.gitignore
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+[commit]
+  gpgsign = true
