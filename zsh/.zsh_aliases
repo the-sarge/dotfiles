@@ -1,5 +1,9 @@
 if [[ -n 'which eza' ]]; then
-	alias ls="eza"
+	alias ls="eza -F --time-style=long-iso"
+	alias l="ls -l --no-permissions --no-filesize --no-user --no-time"
+	alias lg="l -a --no-permissions --no-filesize --no-user --git --git-repos"
+	alias ll="ls -alh"
+	alias llg="ll --git --git-repos" 
 fi
 
 # alias ls="ls -FG"
@@ -9,6 +13,7 @@ fi
 # alias lt="ls -ltFGh"
 # alias ldot="ls -ldFGh .*"
 alias lv="ll /Volumes"
+alias lvm="ll -M /Volumes"
 
 alias bb="bbedit --wait --resume"
 alias vi="nvim"

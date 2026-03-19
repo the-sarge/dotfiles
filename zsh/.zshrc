@@ -19,7 +19,7 @@ if [[ -n $SSH_CONNECTION ]]; then
 	export PAGER='less'
 else
 	export EDITOR='/usr/local/bin/bbedit --wait --resume'
-	export PAGER='/usr/local/bin/most'
+	export PAGER='most'
 fi
 
 # Compilation flags
