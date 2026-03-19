@@ -1,7 +1,7 @@
 if [[ -n 'which eza' ]]; then
 	alias ls="eza -F --time-style=long-iso"
 	alias l="ls -l --no-permissions --no-filesize --no-user --no-time"
-	alias lg="l -a --no-permissions --no-filesize --no-user --git --git-repos"
+	alias lg="l -ah --no-permissions --no-filesize --no-user --git --git-repos"
 	alias ll="ls -alh"
 	alias llg="ll --git --git-repos" 
 fi
