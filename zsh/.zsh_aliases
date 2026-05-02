@@ -16,9 +16,13 @@ fi
 alias lv="ll /Volumes"
 alias lvm="ll -M /Volumes"
 
-alias bb="bbedit --wait --resume"
+alias bb="bbedit"
 alias vi="nvim"
 alias vim="nvim"
 alias helix="hx"
 
-alias zshconfig="bb ~/.zshrc"
+alias zshconfig="hx ~/.zshrc"
+alias sshconfig="hx ~/.ssh/config"
+alias tmuxconfig="hx ~/.tmux"
+alias gitconfig="hx ~/.gitconfig"
+alias vimconfig="hx ~/.viminfo"
