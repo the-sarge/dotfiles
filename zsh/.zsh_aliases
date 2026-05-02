@@ -23,6 +23,6 @@ alias helix="hx"
 
 alias zshconfig="hx ~/.zshrc"
 alias sshconfig="hx ~/.ssh/config"
-alias tmuxconfig="hx ~/.tmux"
+alias tmuxconfig="hx ~/.tmux.conf"
 alias gitconfig="hx ~/.gitconfig"
 alias vimconfig="hx ~/.viminfo"
