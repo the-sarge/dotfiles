@@ -22,6 +22,9 @@ else
 	export PAGER='most'
 fi
 
+# Auto-load SSH keys into ssh-agent when no identities are present
+ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/GitHub
+
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
@@ -41,16 +44,28 @@ export PATH="$PATH:/usr/local/go/bin:$(go env GOPATH)/bin"
 # LM Studio CLI (lms)
 export PATH="$PATH:$HOME/.lmstudio/bin"
 # opencode
-export PATH="$HOME/.opencode/bin:$PATH"
+export PATH="$PATH:$HOME/.opencode/bin:$PATH"
+# Antigravity
+export PATH="/Users/josh/.antigravity/antigravity/bin:$PATH"
 
-# carapace
-autoload -U compinit && compinit
-export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
-zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
-source <(carapace _carapace)
+# # carapace
+# autoload -U compinit && compinit
+# export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
+# zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+# source <(carapace _carapace)
+
+# Starship
+eval "$(starship init zsh)"
+
+# zsh-autosuggestions
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# zsh-syntax-highlighting
+source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # zoxide
 eval "$(zoxide init zsh)"
+
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -66,3 +81,8 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+
+
+# Added by Antigravity
+export PATH="/Users/josh/.antigravity/antigravity/bin:$PATH"

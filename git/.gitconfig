@@ -8,10 +8,8 @@
   excludesfile = ~/.gitignore
 
 [gpg]
-  format = ssh
-
-[gpg "ssh"]
-  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+	format = ssh
+	program = /opt/homebrew/bin/gpg
 
 [commit]
-  gpgsign = true
+	gpgsign = true
