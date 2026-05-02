@@ -1,6 +1,7 @@
 if [[ -n 'which eza' ]]; then
 	alias ls="eza -F --time-style=long-iso"
 	alias l="ls -l --no-permissions --no-filesize --no-user --no-time"
+	alias la="l -a"
 	alias lg="l -ah --no-permissions --no-filesize --no-user --git --git-repos"
 	alias ll="ls -alh"
 	alias llg="ll --git --git-repos" 
@@ -18,9 +19,6 @@ alias lvm="ll -M /Volumes"
 alias bb="bbedit --wait --resume"
 alias vi="nvim"
 alias vim="nvim"
+alias helix="hx"
 
-# alias zshconfig="bbedit ~/.zshrc"
-
-if [[ -n 'which tmuxinator' ]]; then
-	alias mux="tmuxinator"
-fi
+alias zshconfig="bb ~/.zshrc"

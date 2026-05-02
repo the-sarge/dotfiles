@@ -84,5 +84,4 @@ unset __conda_setup
 
 
 
-# Added by Antigravity
-export PATH="/Users/josh/.antigravity/antigravity/bin:$PATH"
+
