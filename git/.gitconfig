@@ -1,11 +1,53 @@
 # This is Git's per-user configuration file.
 [user]
-  name = Joshua Sargent
-  email = josh@joshuasargent.com
-  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICNOvO3AW8aSyOLvXw0roQ6F303TThjK6z2XYoOlNQD9
+	name = Joshua Sargent
+	email = josh@joshuasargent.com
+	signingkey = ~/.ssh/GitHub.pub
 
 [core]
-  excludesfile = ~/.gitignore
+	excludesfile = ~/.gitignore
+	editor = hx
+	pager = less -FRX
+
+[init]
+	defaultBranch = main
+
+[push]
+	default = simple
+	autoSetupRemote = true
+	followTags = true
+
+[pull]
+	rebase = false
+	ff = only
+
+[fetch]
+	prune = true
+	pruneTags = true
+
+[rebase]
+	autoStash = true
+	autoSquash = true
+
+[diff]
+    algorithm = histogram
+    colorMoved = default
+    colorMovedWS = allow-indentation-change
+    mnemonicPrefix = true
+    renames = copies
+
+[merge]
+    conflictStyle = zdiff3
+
+[branch]
+    sort = -committerdate
+
+[tag]
+    sort = version:refname
+	gpgsign = true
+
+[column]
+    ui = auto
 
 [gpg]
 	format = ssh

@@ -17,6 +17,9 @@ fi
 alias lv="ll /Volumes"
 alias lvm="ll -M /Volumes"
 
+alias cat="bat"
+
+
 alias bb="bbedit"
 alias vi="nvim"
 alias vim="nvim"
@@ -34,6 +37,7 @@ alias gd='git diff'
 alias ga='git add'
 alias gaa='git add --all'
 alias gc='git commit'
+alias gca='git commit -a'
 alias gcm='git commit -m'
 alias gcam='git commit -am'
 alias gp='git push'

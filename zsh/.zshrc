@@ -15,11 +15,11 @@ export CLICOLOR=1
 # fi
 
 if [[ -n $SSH_CONNECTION ]]; then
-	export EDITOR='vim'
+	export EDITOR='hx'
 	export PAGER='less'
 else
 	export EDITOR='/usr/local/bin/bbedit --wait --resume'
-	export PAGER='most'
+	export PAGER='less'
 fi
 
 # Auto-load SSH keys into ssh-agent when no identities are present
