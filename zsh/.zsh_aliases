@@ -2,8 +2,9 @@ if [[ -n 'which eza' ]]; then
 	alias ls="eza -F --time-style=long-iso"
 	alias l="ls -l --no-permissions --no-filesize --no-user --no-time"
 	alias la="l -a"
+	alias ll="ls -lh"
+	alias lal="ls -alh"
 	alias lg="l -ah --no-permissions --no-filesize --no-user --git --git-repos"
-	alias ll="ls -alh"
 	alias llg="ll --git --git-repos" 
 fi
 
@@ -26,3 +27,17 @@ alias sshconfig="hx ~/.ssh/config"
 alias tmuxconfig="hx ~/.tmux.conf"
 alias gitconfig="hx ~/.gitconfig"
 alias vimconfig="hx ~/.viminfo"
+
+alias gs='git status'
+alias gss='git status -s'           # short format
+alias gd='git diff'
+alias ga='git add'
+alias gaa='git add --all'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gcam='git commit -am'
+alias gp='git push'
+alias gpl='git pull'
+alias gf='git fetch'
+alias gfa='git fetch --all --prune'
+alias gm='git merge'
