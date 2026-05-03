@@ -151,7 +151,7 @@ style = "bg:sapphire"
 format = '[[ $symbol( $context) ](fg:crust bg:sapphire)]($style)'
 
 [conda]
-symbol = "  "
+symbol = " 󱔎 " # 
 style = "fg:crust bg:lavender"
 format = '[$symbol$environment ]($style)'
 ignore_base = true
