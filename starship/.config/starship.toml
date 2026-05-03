@@ -1,16 +1,16 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[](red)\
+[](red)\
 $os\
 $username\
 $hostname\
-[](bg:peach fg:red)\
+[](fg:red bg:peach)\
 $directory\
-[](bg:yellow fg:peach)\
+[](fg:peach bg:green)\
 $git_branch\
 $git_status\
-[](fg:yellow bg:green)\
+[](fg:green bg:yellow)\
 $c\
 $rust\
 $golang\
@@ -21,12 +21,12 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[](fg:green bg:sapphire)\
+[](fg:yellow bg:lavender)\
 $conda\
-[](fg:sapphire bg:lavender)\
-$time\
-[ ](fg:lavender)\
-$cmd_duration\
+[](fg:lavender bg:sapphire)\
+$docker_context\
+[](fg:sapphire bg:red)\
+[](fg:red)\
 $line_break\
 $character"""
 
@@ -34,7 +34,7 @@ palette = 'catppuccin_mocha'
 
 [os]
 disabled = false
-style = "bg:red fg:crust"
+style = "fg:crust bg:red"
 
 [os.symbols]
 Windows = ""
@@ -57,22 +57,26 @@ CentOS = ""
 Debian = "󰣚"
 Redhat = "󱄛"
 RedHatEnterprise = "󱄛"
+FreeBSD = ""
+NetBSD = "BSD"
+OpenBSD = ""
 
 [username]
 show_always = true
-style_user = "bg:red fg:crust"
-style_root = "bg:red fg:crust"
+style_user = "fg:crust bg:red"
+style_root = "fg:yellow bold bg:maroon"
 format = '[ $user]($style)'
 
 [hostname]
-ssh_only = false
-style = "bg:red fg:crust"
-format = '[@$hostname ]($style)'
+ssh_only = true
+# SSH connection: "󰣀"
+style = "bold fg:crust bg:red"
+format = '[@$hostname 󰣀 ]($style)'
 
 [directory]
-style = "bg:peach fg:crust"
+style = "fg:crust bg:peach"
 format = "[ $path ]($style)"
-truncation_length = 5
+truncation_length = 4
 truncation_symbol = "…/"
 
 [directory.substitutions]
@@ -84,62 +88,62 @@ truncation_symbol = "…/"
 
 [git_branch]
 symbol = ""
-style = "bg:yellow"
-format = '[[ $symbol $branch ](fg:crust bg:yellow)]($style)'
+style = "bg:green"
+format = '[[ $symbol $branch ](fg:crust bg:green)]($style)'
 
 [git_status]
-style = "bg:yellow"
-format = '[[($all_status$ahead_behind )](fg:crust bg:yellow)]($style)'
+style = "bg:green"
+format = '[[($all_status$ahead_behind )](fg:crust bg:green)]($style)'
 
 [nodejs]
 symbol = ""
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [bun]
 symbol = ""
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [c]
 symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [rust]
 symbol = ""
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [golang]
-symbol = ""
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+symbol = ""
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [php]
 symbol = ""
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [java]
 symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [kotlin]
 symbol = ""
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [haskell]
 symbol = ""
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version) ](fg:crust bg:yellow)]($style)'
 
 [python]
 symbol = ""
-style = "bg:green"
-format = '[[ $symbol( $version)(\(#$virtualenv\)) ](fg:crust bg:green)]($style)'
+style = "bg:yellow"
+format = '[[ $symbol( $version)(\(#$virtualenv\)) ](fg:crust bg:yellow)]($style)'
 
 [docker_context]
 symbol = ""
@@ -148,15 +152,9 @@ format = '[[ $symbol( $context) ](fg:crust bg:sapphire)]($style)'
 
 [conda]
 symbol = "  "
-style = "fg:crust bg:sapphire"
+style = "fg:crust bg:lavender"
 format = '[$symbol$environment ]($style)'
 ignore_base = true
-
-[time]
-disabled = false
-time_format = "%R"
-style = "bg:lavender"
-format = '[[  $time ](fg:crust bg:lavender)]($style)'
 
 [line_break]
 disabled = true
@@ -169,14 +167,6 @@ vimcmd_symbol = '[❮](bold fg:green)'
 vimcmd_replace_one_symbol = '[❮](bold fg:lavender)'
 vimcmd_replace_symbol = '[❮](bold fg:lavender)'
 vimcmd_visual_symbol = '[❮](bold fg:yellow)'
-
-[cmd_duration]
-show_milliseconds = true
-format = " in $duration "
-style = "bg:lavender"
-disabled = false
-show_notifications = true
-min_time_to_notify = 45000
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
