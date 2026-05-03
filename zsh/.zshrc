@@ -28,12 +28,6 @@ ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/GitHub
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-# Functions
-source ~/.dotfiles/zsh/.zsh_functions
-
-# Aliases
-source ~/.dotfiles/zsh/.zsh_aliases
-
 # PATH
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
@@ -82,6 +76,10 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+# Aliases
+source ~/.dotfiles/zsh/.zsh_aliases
 
+# Functions
+source ~/.dotfiles/zsh/.zsh_functions
 
 

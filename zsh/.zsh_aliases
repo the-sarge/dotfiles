@@ -3,6 +3,7 @@ if [[ -n 'which eza' ]]; then
 	alias l="ls -l --no-permissions --no-filesize --no-user --no-time"
 	alias la="l -a"
 	alias ll="ls -lh"
+	alias lla="ls -alh"
 	alias lal="ls -alh"
 	alias lg="l -ah --no-permissions --no-filesize --no-user --git --git-repos"
 	alias llg="ll --git --git-repos" 
@@ -16,6 +17,9 @@ fi
 # alias ldot="ls -ldFGh .*"
 alias lv="ll /Volumes"
 alias lvm="ll -M /Volumes"
+
+alias j="z" 	# j was autojump before zoxide. I like the j key better"
+alias ji="zi"
 
 alias cat="bat"
 
