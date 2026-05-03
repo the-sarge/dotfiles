@@ -6,3 +6,370 @@ cmd=$(tr "[:lower:]" "[:upper:]" <<< "$1")
 man $1 | col -b | /usr/local/bin/bbedit --view-top --clean -t "$cmd MANUAL"
 }
 
+# =============================================================================
+# Command timestamp + status indicator hooks
+# -----------------------------------------------------------------------------
+# Adds two zsh hooks for richer scrollback:
+#
+#   preexec  -> prints an ISO timestamp BEFORE the command runs
+#   precmd   -> prints a consolidated status + timestamps line AFTER it ends
+#
+# Boring commands (cd, ls, etc.) are skipped to keep scrollback clean.
+# Pipelines and command chains (|, &&, ||, ;) are inspected as a whole — if
+# ANY segment is "interesting", the timestamps print for the entire chain.
+#
+# Layout per interesting command:
+#
+#   [issued: 2026-05-03T13:54:03-0400]          <- preexec start timestamp
+#   $ make build                                 <- the command
+#   ... output ...                               <- command output
+#   [exit: 0] ✓ OK                               <- precmd consolidated block
+#   [begin: 2026-05-03T13:54:03-0400]
+#   [end: 2026-05-03T13:54:15-0400]
+#   [elapsed: 12.45s]
+#
+# The start timestamp stays visible during execution AND remains in scrollback
+# afterward. The final block is slightly redundant with the start timestamp,
+# which is a deliberate trade for implementation simplicity (no cursor
+# querying or line erasing required).
+# =============================================================================
+
+# Required zsh modules:
+#   add-zsh-hook  -- registers functions on hook arrays without clobbering
+#                    other hooks (e.g. Starship's). Always use this instead of
+#                    defining preexec()/precmd() directly.
+autoload -Uz add-zsh-hook
+
+# zsh/datetime gives us $EPOCHREALTIME — float seconds since the epoch with
+# sub-second precision. Used to measure command duration.
+zmodload zsh/datetime
+
+# Tracks whether the current command should print its post-run status line.
+# Set to 1 in preexec when a command is "interesting", 0 when it's boring.
+# Read in precmd to decide whether to print anything.
+_cmd_ran=0
+
+# Captured start time as a plain ISO string. Set in preexec, read in precmd
+# so the consolidated final line can include "begin: <timestamp>" without
+# re-querying or having to parse the printed timestamp.
+_cmd_start_iso=""
+
+# Captured high-precision start time (float epoch seconds) for elapsed
+# duration calculation in precmd. Set in preexec alongside _cmd_start_iso.
+_cmd_start_epoch=0
+
+# Commands considered too boring to bother timestamping. Edit to taste.
+# Matched against the FIRST WORD of each pipeline segment, after stripping
+# wrappers like sudo/time/nice. Aliases may or may not be expanded by the
+# time preexec sees them — test with your own aliases if in doubt.
+_skip_commands=(
+  # Navigation
+  cd pushd popd dirs
+  z j zoxide                    # smart directory jumpers
+  ..                            # if you have an alias for `cd ..`
+
+  # Listing & inspection
+  ls l la ll lal lg llg lv lvm lsd exa eza tree
+  pwd
+  stat file
+
+  # Display / no-op
+  clear cls reset
+  echo printf
+  true false :                  # `:` is the bash/zsh no-op
+  type which whence command
+
+  # Pagers / viewers (output-only, you didn't run anything)
+  cat bat
+  less more most
+  head tail
+
+  # Shell control
+  exit logout
+  fg bg jobs disown wait
+  #kill                          # debatable — see notes below
+  alias unalias
+  set unset export
+  #history
+  source .                      # `.` is sourcing, like `source`
+
+  # Help / docs
+  help man info tldr cheat
+
+  # Quick file inspections (debatable — see notes)
+  wc
+)
+
+
+# -----------------------------------------------------------------------------
+# preexec: fires AFTER you press Enter but BEFORE the command runs.
+# zsh passes the typed command line as $1.
+# -----------------------------------------------------------------------------
+_timestamp_preexec() {
+  local full_cmd="$1"
+  local pipeline_is_interesting=0
+
+  # Step 1: normalize all command separators to a single sentinel character
+  # so we can split the command line into independently-inspectable segments.
+  #
+  # The pattern (\&\&|\|\||;|\|) matches any of:
+  #   &&   logical AND
+  #   ||   logical OR
+  #   ;    sequential separator
+  #   |    pipe
+  # Order in the alternation matters: && and || must be tested before | so
+  # the two-character operators match first.
+  #
+  # \x1f is ASCII Unit Separator — a control character that essentially never
+  # appears in real shell commands, making it a safe replacement delimiter.
+  local normalized="${full_cmd//(\&\&|\|\||;|\|)/$'\x1f'}"
+
+  # Step 2: split the normalized string on \x1f into an array of segments.
+  # The (@s:DELIM:) zsh parameter expansion flag splits on DELIM; @ wraps
+  # the result as an array.
+  local -a segments
+  segments=("${(@s:$'\x1f':)normalized}")
+
+  # Step 3: inspect each segment. As soon as we find ONE that's interesting,
+  # mark the whole pipeline as interesting and stop looking.
+  local seg cmd
+  for seg in $segments; do
+    # Trim leading and trailing whitespace from the segment.
+    # ## and %% with the [[:space:]]## glob remove one-or-more spaces
+    # at the start (##) or end (%%) of the string.
+    seg="${seg##[[:space:]]##}"
+    seg="${seg%%[[:space:]]##}"
+
+    # Empty segments can happen with leading/trailing separators
+    # (e.g. "ls;" produces a trailing empty segment). Skip them.
+    [[ -z $seg ]] && continue
+
+    # Step 3a: peel off any wrapping commands that don't represent the real
+    # work being done. For example, "sudo make build" is really a make build,
+    # so we want to inspect "make", not "sudo".
+    #
+    # Loop because wrappers can stack: "sudo time make build" -> "make build".
+    while true; do
+      # ${seg%% *} removes everything from the first space onward,
+      # leaving just the first word.
+      cmd="${seg%% *}"
+      case $cmd in
+        sudo|time|nice|env|command|builtin|exec)
+          # ${seg#* } removes everything UP TO and including the first space,
+          # effectively dropping the wrapper word.
+          seg="${seg#* }"
+          ;;
+        *)
+          break
+          ;;
+      esac
+    done
+
+    # After unwrapping, get the actual command name.
+    cmd="${seg%% *}"
+
+    # Step 3b: check the skip list.
+    # ${array[(Ie)pattern]} returns the index of the first exact match,
+    # or 0 if not found. Wrapping in (( )) makes 0 falsy and any positive
+    # index truthy. The ! negates: "if NOT in skip list, it's interesting."
+    if (( ! ${_skip_commands[(Ie)$cmd]} )); then
+      pipeline_is_interesting=1
+      break  # No need to check remaining segments
+    fi
+  done
+
+  # Step 4: if nothing interesting was found, mark the command as skipped
+  # so precmd won't print anything either, and bail out.
+  if (( ! pipeline_is_interesting )); then
+    _cmd_ran=0
+    return
+  fi
+
+  # Step 5: command is interesting. Mark it for precmd to follow up on,
+  # capture the start time as both an ISO string (for display) and a
+  # high-precision epoch float (for elapsed calculation), then print the
+  # start timestamp.
+  _cmd_ran=1
+  _cmd_start_iso=$(date "+%Y-%m-%dT%H:%M:%S%z")
+  _cmd_start_epoch=$EPOCHREALTIME
+
+  # The timestamp format uses %F{color}/%f to color portions differently:
+  #   %F{default}  -- terminal's default fg color (theme-adaptive)
+  #   %F{8}        -- ANSI bright-black / gray
+  #   %f           -- reset to default
+  #
+  # Result: "[issued: 2026-05-03T15:42:05-0400]" with "issued:", T, and
+  # the timezone offset all dimmed.
+  print -P "%F{default}[%F{8}issued:%F{default}  %D{%Y-%m-%d}%F{8}T%F{default}%D{%H:%M:%S}%F{8}%D{%z}%F{default}]%f"
+}
+add-zsh-hook preexec _timestamp_preexec
+
+# -----------------------------------------------------------------------------
+# Format a duration in seconds (float) as a human-readable string.
+#
+#   < 60s           "12.34s"
+#   < 1 hour        "5m 23.4s"
+#   >= 1 hour       "2h 5m 23s"
+#
+# Uses zsh's typed integer locals to truncate floats: assigning a float to
+# a `local -i` integer drops the fractional part automatically.
+# -----------------------------------------------------------------------------
+_format_duration() {
+  local total=$1
+  local -i hours mins
+  local secs
+
+  if (( total < 60 )); then
+    printf '%.2fs' $total
+    return
+  fi
+
+  if (( total < 3600 )); then
+    (( mins = total / 60 ))
+    (( secs = total - mins * 60 ))
+    printf '%dm %.1fs' $mins $secs
+    return
+  fi
+
+  (( hours = total / 3600 ))
+  (( mins = (total - hours * 3600) / 60 ))
+  (( secs = total - hours * 3600 - mins * 60 ))
+  printf '%dh %dm %.0fs' $hours $mins $secs
+}
+
+# -----------------------------------------------------------------------------
+# Maps an exit code to a human-readable label with a Unicode glyph indicating
+# severity:
+#   ✓  successful completion
+#   ✗  generic failure / error
+#   ⚠  interrupted by signal (Ctrl+C, SIGTERM) — recoverable
+#   ☠  killed (SIGKILL) or crashed (SIGSEGV) — bad
+# -----------------------------------------------------------------------------
+_status_label() {
+  local code=$1
+  case $code in
+    0)   echo "✓ OK" ;;
+    1)   echo "✗ ERR" ;;
+    2)   echo "✗ USAGE" ;;       # Usage error (bad args, missing flags)
+    126) echo "✗ NOEXEC" ;;      # Command found but not executable
+    127) echo "✗ NOTFOUND" ;;    # Command not found
+    130) echo "⚠ SIGINT" ;;      # 128 + 2  (Ctrl+C)
+    131) echo "⚠ SIGQUIT" ;;     # 128 + 3  (Ctrl+\)
+    137) echo "☠ SIGKILL" ;;     # 128 + 9  (kill -9, OOM killer)
+    139) echo "☠ SIGSEGV" ;;     # 128 + 11 (segfault)
+    143) echo "⚠ SIGTERM" ;;     # 128 + 15 (graceful kill)
+    *)
+      # Unix convention: exit codes 129..164 mean "killed by signal N",
+      # where N = code - 128. Try to translate dynamically.
+      if (( code > 128 && code < 165 )); then
+        # zsh's `kill -l N` returns the signal name without the SIG prefix
+        # (e.g. 6 -> "ABRT"). We prepend SIG manually for readability.
+        local signame=$(kill -l $((code - 128)) 2>/dev/null)
+        if [[ -n $signame ]]; then
+          echo "⚠ SIG${signame}"
+        else
+          echo "✗ ERR"
+        fi
+      else
+        echo "✗ ERR"
+      fi
+      ;;
+  esac
+}
+
+# -----------------------------------------------------------------------------
+# precmd: fires AFTER a command finishes, BEFORE the next prompt is drawn.
+# Prints a consolidated status block: exit code/label, begin/end timestamps,
+# and elapsed duration, each on its own line.
+# -----------------------------------------------------------------------------
+_status_precmd() {
+  # CRITICAL: $? must be captured FIRST. Almost any other command — even a
+  # local variable assignment with command substitution — will overwrite it.
+  local last_status=$?
+  # Only fire if preexec actually ran AND marked the command as interesting.
+  # This prevents output on:
+  #   - the very first prompt of a new shell (preexec hasn't run yet)
+  #   - empty Enter presses (preexec doesn't fire for those)
+  #   - skipped commands like `cd` and `ls`
+  if (( _cmd_ran )); then
+    _cmd_ran=0  # Reset for next command
+    local label=$(_status_label $last_status)
+
+    # Calculate elapsed time using high-precision epoch values, then format
+    # it as a human-readable string (e.g. "5.01s", "2m 12.4s", "1h 23m 45s").
+    local elapsed=$(( EPOCHREALTIME - _cmd_start_epoch ))
+    local elapsed_str=$(_format_duration $elapsed)
+
+    # Capture end time as three pieces so the T separator and timezone
+    # can be styled independently from the date/time portion.
+    local end_date end_time end_tz
+    end_date=$(date "+%Y-%m-%d")
+    end_time=$(date "+%H:%M:%S")
+    end_tz=$(date "+%z")
+
+    # Split the captured start ISO into the same three pieces.
+    # _cmd_start_iso looks like "2026-05-03T13:54:03-0400".
+    # Splitting on T gives us the date; the rest is HH:MM:SS±HHMM, which
+    # we slice by fixed offset since HH:MM:SS is always exactly 8 chars.
+    local start_date start_time start_tz
+    start_date="${_cmd_start_iso%%T*}"
+    local rest="${_cmd_start_iso#*T}"
+    start_time="${rest:0:8}"
+    start_tz="${rest:8}"
+
+    # ANSI escape sequences used below:
+    #   \033[39m       reset foreground to default (theme-adaptive)
+    #   \033[32m       green
+    #   \033[1;91m     bold + bright red
+    #   \033[2m        dim (used for "exit:" / "begin:" / "end:" / "elapsed:" labels)
+    #   \033[22m       reset dim attribute ONLY, preserving foreground color
+    #                  (using \033[0m here would also clear color we want kept)
+    #   \033[0m        full reset
+    #   \033[0;39m     full reset, then default fg
+    #
+    # Using named ANSI colors (32, 91, 39) instead of 256-color codes so the
+    # output adapts to whatever theme the terminal is configured with.
+    #
+    # Layout (each on its own line):
+    #
+    #   [exit: CODE] LABEL                <- whole line colored by status
+    #   [begin: DATE T TIME TZ]           <- T and TZ dim, date/time bright
+    #   [end:   DATE T TIME TZ]           <- same dim treatment as begin
+    #   [elapsed: VALUE]                  <- value bright, label dim
+    #
+    # The status color (green/red) applies to the entire first line so
+    # success/failure reads at a glance. The other lines use neutral default
+    # color since timestamps and durations don't carry status meaning of
+    # their own — they're observations, not judgments.
+    local color reset
+    if (( last_status == 0 )); then
+      color='\033[32m'         # green
+      reset='\033[39m'         # back to default fg
+    else
+      color='\033[1;91m'       # bold + bright red
+      reset='\033[0;39m'       # full reset, then default fg
+    fi
+
+    # Line 1: [begin: TIMESTAMP] — bright date/time, dim T and timezone.
+    printf '\033[39m[\033[2mbegin:\033[22m   %s\033[2mT\033[22m%s\033[2m%s\033[22m]\033[0m\n' \
+      "$start_date" "$start_time" "$start_tz"
+
+    # Line 2: [end: TIMESTAMP] — same treatment as begin.
+    printf '\033[39m[\033[2mend:\033[22m     %s\033[2mT\033[22m%s\033[2m%s\033[22m]\033[0m\n' \
+      "$end_date" "$end_time" "$end_tz"
+
+    # Line 3: [elapsed: VALUE] — bright value, dim label.
+    printf '\033[39m[\033[2melapsed:\033[22m %s]\033[0m\n' \
+      "$elapsed_str"
+
+    # Line 4: [exit: CODE] LABEL — colored by status.
+    # %b interprets backslash escapes in the argument, which is needed
+    # because $color/$reset contain literal \033 sequences passed as
+    # variables (rather than embedded in the format string itself).
+    printf '%b[\033[2mexit:\033[22m %d] %s%b\n' \
+      "$color" "$last_status" "$label" "$reset"
+
+
+  fi
+}
+add-zsh-hook precmd _status_precmd
