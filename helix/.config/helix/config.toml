@@ -1,0 +1,77 @@
+# Use the dark Catppuccin palette that matches the rest of the terminal setup.
+theme = "catppuccin_mocha"
+
+[editor]
+# Show relative line numbers in normal/select mode for easier motion counts.
+line-number = "relative"
+
+# Highlight the full line under the cursor.
+cursorline = true
+
+# Color the mode indicator differently for normal, insert, and select modes.
+color-modes = true
+
+# Show the bufferline only when more than one buffer is open.
+bufferline = "multiple"
+
+# Force true-color rendering when terminal auto-detection is wrong.
+true-color = true
+
+# Draw borders around popups and completion menus.
+popup-border = "all"
+
+# Show vertical guide columns for common width targets.
+rulers = [80, 100]
+
+# Set the default width used by :reflow and wrap-at-text-width.
+text-width = 100
+
+# Ensure saved files end with one final newline.
+insert-final-newline = true
+
+# Remove extra blank line endings at the end of files on save.
+trim-final-newlines = true
+
+# Remove trailing spaces at line ends on save.
+#trim-trailing-whitespace = true
+
+# Show warning and error diagnostics at the end of affected lines.
+end-of-line-diagnostics = "warning"
+
+[editor.cursor-shape]
+# Use a block cursor while navigating.
+normal = "block"
+
+# Use a bar cursor while inserting text.
+insert = "bar"
+
+# Use an underline cursor while extending selections.
+select = "underline"
+
+[editor.file-picker]
+# Include dotfiles and hidden directories in pickers, useful for dotfiles work.
+hidden = false
+
+[editor.indent-guides]
+# Render vertical guides for nested indentation.
+render = true
+
+# Use an ASCII guide character for portability across terminals and fonts.
+character = "|"
+
+# Hide the first indent guide to reduce visual clutter near the margin.
+skip-levels = 1
+
+[editor.inline-diagnostics]
+# Show warning and error diagnostics inline on the current cursor line.
+cursor-line = "warning"
+
+# Keep non-current lines quieter; end-of-line diagnostics still apply.
+other-lines = "disable"
+
+[editor.statusline]
+# Keep mode, LSP activity, file name, and modification state on the left.
+left = ["mode", "spinner", "file-name", "read-only-indicator", "file-modification-indicator"]
+
+# Keep diagnostics, selection state, cursor position, line ending, and file type on the right.
+right = ["diagnostics", "workspace-diagnostics", "selections", "register", "position", "file-line-ending", "file-type"]
