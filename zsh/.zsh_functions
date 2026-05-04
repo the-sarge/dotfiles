@@ -106,6 +106,8 @@ _skip_commands=(
 # zsh passes the typed command line as $1.
 # -----------------------------------------------------------------------------
 _timestamp_preexec() {
+  setopt local_options extended_glob
+
   local full_cmd="$1"
   local pipeline_is_interesting=0
 

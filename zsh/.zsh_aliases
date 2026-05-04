@@ -1,4 +1,4 @@
-if [[ -n 'which eza' ]]; then
+if command -v eza >/dev/null 2>&1; then
 	alias ls="eza -F --time-style=long-iso"
 	alias l="ls -l --no-permissions --no-filesize --no-user --no-time"
 	alias la="l -a"

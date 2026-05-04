@@ -22,8 +22,14 @@ else
 	export PAGER='less'
 fi
 
-# Auto-load SSH keys into ssh-agent when no identities are present
-ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/GitHub
+# Auto-load GitHub SSH key into ssh-agent when available and absent.
+if [[ -o interactive && -n $SSH_AUTH_SOCK && -r $HOME/.ssh/GitHub && -r $HOME/.ssh/GitHub.pub ]]; then
+	github_key_fingerprint=$(ssh-keygen -lf "$HOME/.ssh/GitHub.pub" 2>/dev/null | awk '{print $2}')
+	if [[ -n $github_key_fingerprint ]] && ! ssh-add -l 2>/dev/null | grep -Fq "$github_key_fingerprint"; then
+		ssh-add -q "$HOME/.ssh/GitHub" </dev/null 2>/dev/null
+	fi
+	unset github_key_fingerprint
+fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -34,11 +40,14 @@ export PATH="/usr/local/sbin:$PATH"
 # Homebrew
 export PATH="$PATH:/opt/homebrew/bin"
 # Go
-export PATH="$PATH:/usr/local/go/bin:$(go env GOPATH)/bin"
+export PATH="$PATH:/usr/local/go/bin"
+if command -v go >/dev/null 2>&1; then
+	export PATH="$PATH:$(go env GOPATH)/bin"
+fi
 # LM Studio CLI (lms)
 export PATH="$PATH:$HOME/.lmstudio/bin"
 # opencode
-export PATH="$PATH:$HOME/.opencode/bin:$PATH"
+export PATH="$PATH:$HOME/.opencode/bin"
 # Antigravity
 export PATH="/Users/josh/.antigravity/antigravity/bin:$PATH"
 
