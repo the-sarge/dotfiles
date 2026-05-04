@@ -50,6 +50,9 @@ export PATH="$PATH:$HOME/.lmstudio/bin"
 export PATH="$PATH:$HOME/.opencode/bin"
 # Antigravity
 export PATH="/Users/josh/.antigravity/antigravity/bin:$PATH"
+# gcloud-cli
+export PATH=/opt/homebrew/share/google-cloud-sdk/bin:"$PATH"
+
 
 # # carapace
 # autoload -U compinit && compinit
@@ -90,5 +93,4 @@ source ~/.dotfiles/zsh/.zsh_aliases
 
 # Functions
 source ~/.dotfiles/zsh/.zsh_functions
-
 
