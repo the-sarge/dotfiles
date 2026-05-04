@@ -35,6 +35,10 @@ alias tmuxconfig="hx ~/.tmux.conf"
 alias gitconfig="hx ~/.gitconfig"
 alias vimconfig="hx ~/.viminfo"
 
+alias ts-on="timestamp-hooks-on"
+alias ts-off="timestamp-hooks-off"
+alias ts-toggle="timestamp-hooks-toggle"
+
 alias gs='git status'
 alias gss='git status -s'           # short format
 alias gd='git diff'

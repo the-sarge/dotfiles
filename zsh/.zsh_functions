@@ -375,3 +375,22 @@ _status_precmd() {
   fi
 }
 add-zsh-hook precmd _status_precmd
+
+timestamp-hooks-off() {
+  add-zsh-hook -d preexec _timestamp_preexec
+  add-zsh-hook -d precmd _status_precmd
+  _cmd_ran=0
+}
+
+timestamp-hooks-on() {
+  add-zsh-hook preexec _timestamp_preexec
+  add-zsh-hook precmd _status_precmd
+}
+
+timestamp-hooks-toggle() {
+  if (( ${preexec_functions[(Ie)_timestamp_preexec]} )); then
+    timestamp-hooks-off
+  else
+    timestamp-hooks-on
+  fi
+}
