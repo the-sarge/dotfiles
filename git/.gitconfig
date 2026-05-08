@@ -1,7 +1,7 @@
 # This is Git's per-user configuration file.
 [user]
 	name = Joshua Sargent
-	email = josh@joshuasargent.com
+	email = the-sarge@the-sarge.com
 	signingkey = ~/.ssh/GitHub.pub
 
 [core]
@@ -58,3 +58,5 @@
 
 [url "git@github.com:"]
 	insteadOf = https://github.com/
+[gpg "ssh"]
+	allowedSignersFile = /Users/josh/.config/git/allowed_signers
