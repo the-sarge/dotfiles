@@ -1,3 +1,7 @@
 # TPM plugin checkouts are managed by TPM, not this dotfiles repo.
 tmux/.tmux/plugins/
 tmux/.tmux/resurrect/
+
+# Runtime logs and per-machine installer state (regenerated automatically).
+btop/.config/btop/btop.log
+broot/.config/broot/launcher/

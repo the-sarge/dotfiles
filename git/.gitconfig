@@ -59,4 +59,4 @@
 [url "git@github.com:"]
 	insteadOf = https://github.com/
 [gpg "ssh"]
-	allowedSignersFile = /Users/josh/.config/git/allowed_signers
+	allowedSignersFile = ~/.config/git/allowed_signers
