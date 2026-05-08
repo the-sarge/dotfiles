@@ -14,14 +14,8 @@ export CLICOLOR=1
 #   export EDITOR='mvim'
 # fi
 
-if [[ -n $SSH_CONNECTION ]]; then
-	export EDITOR='hx'
-	export PAGER='less'
-else
-#	export EDITOR='/usr/local/bin/bbedit --wait --resume'
-	export EDITOR='hx'
-	export PAGER='less'
-fi
+export EDITOR='hx'
+export PAGER='less'
 
 # Auto-load GitHub SSH key into ssh-agent when available and absent.
 if [[ -o interactive && -n $SSH_AUTH_SOCK && -r $HOME/.ssh/GitHub && -r $HOME/.ssh/GitHub.pub ]]; then
@@ -35,11 +29,10 @@ fi
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-# PATH
+# PATH (Homebrew is set up earlier by .zprofile via `brew shellenv`,
+# which exports HOMEBREW_PREFIX/PATH/etc. We append/prepend per-tool here.)
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
-# Homebrew
-export PATH="$PATH:/opt/homebrew/bin"
 # Go
 export PATH="$PATH:/usr/local/go/bin"
 if command -v go >/dev/null 2>&1; then
@@ -50,9 +43,11 @@ export PATH="$PATH:$HOME/.lmstudio/bin"
 # opencode
 export PATH="$PATH:$HOME/.opencode/bin"
 # Antigravity
-export PATH="/Users/josh/.antigravity/antigravity/bin:$PATH"
-# gcloud-cli
-export PATH=/opt/homebrew/share/google-cloud-sdk/bin:"$PATH"
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+# gcloud-cli (installed via `brew install --cask google-cloud-sdk`)
+if [ -n "${HOMEBREW_PREFIX:-}" ] && [ -d "$HOMEBREW_PREFIX/share/google-cloud-sdk/bin" ]; then
+	export PATH="$HOMEBREW_PREFIX/share/google-cloud-sdk/bin:$PATH"
+fi
 
 
 # # carapace
@@ -74,20 +69,7 @@ source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 eval "$(zoxide init zsh)"
 
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/opt/homebrew/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/opt/homebrew/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/opt/homebrew/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/opt/homebrew/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+# Per-machine conda init lives outside dotfiles; run `conda init zsh` to (re)generate.
 
 # Aliases
 source ~/.dotfiles/zsh/.zsh_aliases
@@ -99,4 +81,4 @@ source ~/.dotfiles/zsh/.zsh_functions
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 
-source /Users/josh/.config/broot/launcher/bash/br
+source ~/.config/broot/launcher/bash/br

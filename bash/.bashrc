@@ -6,7 +6,7 @@ if [[ -n $SSH_CONNECTION ]]; then
 	export EDITOR='vim'
 	export PAGER='less'
 else
-	export EDITOR='/usr/local/bin/bbedit --wait --resume'
+	export EDITOR='bbedit --wait --resume'
 	export PAGER='most'
 fi
 
@@ -20,4 +20,4 @@ source ~/.dotfiles/bash/.bash_aliases
 # Functions
 source ~/.dotfiles/bash/.bash_functions
 
-source /Users/josh/.config/broot/launcher/bash/br
+source ~/.config/broot/launcher/bash/br

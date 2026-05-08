@@ -40,8 +40,6 @@ first (see `bin/migrate-config-to-stow.sh` for the pattern).
 | `ssh`        | `.ssh/config`                              |
 | `tmux`       | `.tmux.conf` (TPM plugins not tracked)     |
 | `nvim`       | `.viminfo` (legacy)                        |
-| `anaconda`   | conda init shims                           |
-| `conda`      | conda init shims                           |
 
 ### Stowed under `~/.config/`
 
@@ -61,15 +59,28 @@ first (see `bin/migrate-config-to-stow.sh` for the pattern).
 
 ## Per-machine bits NOT in this repo
 
-These either contain secrets, machine-state, or live in OS-specific locations.
+These either contain secrets, machine-state, or are best regenerated locally.
 Set them up by hand on each machine:
 
+- **conda/anaconda**: run `conda init bash` and `conda init zsh` after installing.
+  These write `>>> conda initialize >>>` blocks with paths specific to the
+  machine's anaconda install — keeping them in dotfiles fights the tool.
 - `~/.config/gh/hosts.yml` — `gh auth login` writes this
 - `~/.config/1Password/`, `~/.config/gcloud/`, `~/.config/github-copilot/` — auth state
 - `~/.config/iterm2/` — iTerm2 prefs (`~/Library/Application Support/iTerm2`)
 - `~/.config/karabiner/` — keyboard remapping (machine-specific)
 - `~/.config/{cagent,chezmoi,cmux,darktable,offload,opencode,zed}` — runtime state
 - `~/.ssh/{id_*,known_hosts}` — keys and host fingerprints
+
+## Cross-machine portability notes
+
+- **Homebrew prefix**: Apple Silicon installs to `/opt/homebrew`, Intel to
+  `/usr/local`. Shell init in `zsh/.zprofile` probes both and picks whichever
+  exists. Anything else that needs the prefix should reference `$HOMEBREW_PREFIX`
+  (set by `brew shellenv`) rather than hardcoding either path.
+- **`$HOME` paths**: use `~` or `$HOME`, never `/Users/josh`. Configs that
+  require an absolute path (e.g. `git`'s `allowedSignersFile`) should use `~`,
+  which Git expands. Test with `git config --get <key>` to confirm.
 
 ## Tooling
 

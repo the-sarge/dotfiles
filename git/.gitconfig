@@ -51,7 +51,6 @@
 
 [gpg]
 	format = ssh
-	program = /opt/homebrew/bin/gpg
 
 [commit]
 	gpgsign = true
