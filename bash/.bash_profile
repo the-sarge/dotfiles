@@ -19,3 +19,5 @@ unset __conda_setup
 export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
 
+
+source /Users/josh/.config/broot/launcher/bash/br

@@ -19,3 +19,5 @@ source ~/.dotfiles/bash/.bash_aliases
 
 # Functions
 source ~/.dotfiles/bash/.bash_functions
+
+source /Users/josh/.config/broot/launcher/bash/br

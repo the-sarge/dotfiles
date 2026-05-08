@@ -18,7 +18,8 @@ if [[ -n $SSH_CONNECTION ]]; then
 	export EDITOR='hx'
 	export PAGER='less'
 else
-	export EDITOR='/usr/local/bin/bbedit --wait --resume'
+#	export EDITOR='/usr/local/bin/bbedit --wait --resume'
+	export EDITOR='hx'
 	export PAGER='less'
 fi
 
@@ -97,3 +98,5 @@ source ~/.dotfiles/zsh/.zsh_functions
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+
+source /Users/josh/.config/broot/launcher/bash/br
