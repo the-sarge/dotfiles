@@ -6,3 +6,5 @@ export PATH="$PATH:$HOME/.lmstudio/bin"
 
 
 source ~/.config/broot/launcher/bash/br
+
+source /Users/josh/.config/broot/launcher/bash/br

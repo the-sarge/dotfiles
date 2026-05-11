@@ -21,3 +21,5 @@ source ~/.dotfiles/bash/.bash_aliases
 source ~/.dotfiles/bash/.bash_functions
 
 source ~/.config/broot/launcher/bash/br
+
+source /Users/josh/.config/broot/launcher/bash/br
