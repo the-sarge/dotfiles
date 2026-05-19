@@ -9,3 +9,7 @@ for brew_path in /opt/homebrew/bin/brew /usr/local/bin/brew; do
 		break
 	fi
 done
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/josh/.local/bin:$PATH"
