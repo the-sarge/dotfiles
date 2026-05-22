@@ -5,3 +5,6 @@ tmux/.tmux/resurrect/
 # Runtime logs and per-machine installer state (regenerated automatically).
 btop/.config/btop/btop.log
 broot/.config/broot/launcher/
+
+# Anaconda
+conda/
