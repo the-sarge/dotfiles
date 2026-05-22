@@ -49,7 +49,7 @@ synthesis:
 
 # Agent used to score experiment cells. If unset, ras uses synthesis.agent.
 evaluation:
-  agent: agy
+  agent: claude
 
 # Review pipeline controls.
 review:
@@ -100,7 +100,7 @@ serve:
 
 # Builder used by ras implement. The default builder is codex.
 builder:
-  command: ["agy", "--dangerously-skip-permissions", "--print", "--print-timeout", "15m"]
+  command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
   # Optional fallback builder model when no builder model profile is selected.
   # model: gpt-5.3-codex
   timeout: 30m
