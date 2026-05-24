@@ -27,6 +27,12 @@ agents:
 
 # Optional named model profiles. A selected profile supplies the default
 # multi-agent panel and per-agent models for review-like workflows.
+model_profiles:
+  default-review:
+    agents:
+      - name: codex
+      - name: claude
+      - name: agy
 # model_profiles:
 #   deep-review:
 #     agents:
@@ -53,7 +59,7 @@ evaluation:
 
 # Review pipeline controls.
 review:
-  # model_profile: deep-review
+  model_profile: default-review
   # Optional guidance appended to the built-in ras protocol prompts.
   # prompt: |
   #   Review from architecture, code quality, idiomatic code, security,

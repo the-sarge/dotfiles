@@ -33,21 +33,37 @@ fi
 # which exports HOMEBREW_PREFIX/PATH/etc. We append/prepend per-tool here.)
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
+
 # Go
 export PATH="$PATH:/usr/local/go/bin"
 if command -v go >/dev/null 2>&1; then
 	export PATH="$PATH:$(go env GOPATH)/bin"
 fi
+
 # LM Studio CLI (lms)
 export PATH="$PATH:$HOME/.lmstudio/bin"
+
 # opencode
 export PATH="$PATH:$HOME/.opencode/bin"
+
 # Antigravity
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+
+# Antigravity IDE
+export PATH="/Users/josh/.antigravity-ide/antigravity-ide/bin:$PATH"
+
 # gcloud-cli (installed via `brew install --cask google-cloud-sdk`)
 if [ -n "${HOMEBREW_PREFIX:-}" ] && [ -d "$HOMEBREW_PREFIX/share/google-cloud-sdk/bin" ]; then
 	export PATH="$HOMEBREW_PREFIX/share/google-cloud-sdk/bin:$PATH"
 fi
+
+# mamacli - granola
+export GRANOLA_ENV_FILE="${GRANOLA_ENV_FILE:-$HOME/.config/mamacli/granola.env.op}"
+granola() {
+  command -v op >/dev/null 2>&1 || { echo "op CLI not found" >&2; return 127; }
+  [[ -f "$GRANOLA_ENV_FILE" ]] || { echo "missing $GRANOLA_ENV_FILE" >&2; return 1; }
+  op run --env-file="$GRANOLA_ENV_FILE" -- command granola "$@"
+}
 
 
 # # carapace
@@ -83,8 +99,4 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 source ~/.config/broot/launcher/bash/br
 
-source /Users/josh/.config/broot/launcher/bash/br
 
-
-# Added by Antigravity CLI installer
-export PATH="/Users/josh/.local/bin:$PATH"
