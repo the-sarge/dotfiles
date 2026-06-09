@@ -18,7 +18,7 @@ agents:
     #   EXAMPLE: value
   claude:
     type: subprocess
-    command: ["claude", "-p", "--permission-mode", "bypassPermissions"]
+    command: ["/Users/josh/.local/bin/claude-p", "--permission-mode", "bypassPermissions"]
     # timeout_seconds: 900
   agy:
     type: subprocess
@@ -51,11 +51,11 @@ model_profiles:
 
 # Agent used to synthesize the final review after reviewer/adjudication rounds.
 synthesis:
-  agent: agy
+  agent: claude
 
 # Agent used to score experiment cells. If unset, ras uses synthesis.agent.
 evaluation:
-  agent: claude
+  agent: codex
 
 # Review pipeline controls.
 review:
@@ -66,13 +66,13 @@ review:
   #   and release-readiness perspectives.
 
   # Per-agent timeout in seconds unless an agent-specific timeout is set.
-  timeout_seconds: 900
+  timeout_seconds: 1200
 
   # Run R2/R3 adjudication over reviewer findings before synthesis.
   adjudication: true
 
   # Maximum R3 conflict-resolution rounds after normal R2 adjudication.
-  max_conflict_rounds: 1
+  max_conflict_rounds: 2
 
   # Worktree retention policy: never, on_failure, or always.
   keep_worktrees: on_failure
@@ -106,17 +106,18 @@ serve:
 
 # Builder used by ras implement. The default builder is codex.
 builder:
-  command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
+#   command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
+  command: ["/Users/josh/.local/bin/claude-p", "--permission-mode", "bypassPermissions"]
   # Optional fallback builder model when no builder model profile is selected.
   # model: gpt-5.3-codex
-  timeout: 30m
+  timeout: 60m
   # Optional instructions included in every builder prompt.
   # instructions: |
   #   Run project checks before declaring done.
 
 # Implement-loop controls for ras implement.
 implement:
-  default_mode: local
+  # default_mode: pr
   # PR-backed mode options used when default_mode is pr or --open-pr is passed.
   pr_remote: origin
   # pr_base: main
