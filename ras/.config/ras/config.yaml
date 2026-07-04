@@ -1,16 +1,28 @@
-# Project-local ras configuration.
-# Relative data_dir paths resolve from the repository root.
-# Project config overrides global config.
+# Machine-wide RAS defaults. Project config in .ras/config.yaml overrides these.
+# Set per-agent models here; model_profiles can list agents by name only and inherit
+# these defaults unless a profile entry sets model: explicitly.
 data_dir: ".ras/data"
 
-# Configured review agents. ras runs every configured agent unless --agents is
-# passed. The default set is codex + claude + agy.
+# Local read-only web UI.
+serve:
+  addr: 127.0.0.1:1948
+  # Optional aggregate mode inputs.
+  # workspaces:
+  #   - ..
+  # projects:
+  #   - ../other-project
+
+# ----------------------
+# AGENT CONFIGURATIONS
+# ----------------------
+
+  # Configured review agents. ras runs every configured agent unless --agents is
+# passed.
 agents:
   codex:
     type: subprocess
     command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
-    # Optional default model for this named agent profile.
-    # model: gpt-5.4
+    #model: gpt-5.5
     # timeout_seconds overrides review.timeout_seconds for this agent.
     # timeout_seconds: 900
     # env adds process environment variables for this agent.
@@ -18,12 +30,70 @@ agents:
     #   EXAMPLE: value
   claude:
     type: subprocess
-    command: ["/Users/josh/.local/bin/claude-p", "--permission-mode", "bypassPermissions"]
+    command: ["claude", "-p", "--model", "{model}", "--effort", "xhigh", "--permission-mode", "bypassPermissions"]
+    model: opus
     # timeout_seconds: 900
   agy:
     type: subprocess
     command: ["agy", "--dangerously-skip-permissions", "--print", "--print-timeout", "15m"]
+    # model: <name>  # run: agy models
     # timeout_seconds: 900
+  grok:
+    type: subprocess
+    command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "{model}"]
+    model: grok-build
+    # timeout_seconds: 900
+  cursor:
+    type: subprocess
+    command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: composer-2.5-fast
+  # cursor-gpt:
+  #   type: subprocess
+  #   command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+  #   model: gpt5.5
+  # cursor-opus:
+  #   type: subprocess
+  #   command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+  #   model: opus4.8
+  # cursor-grok:
+  #   type: subprocess
+  #   command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+  #   model: grok4.3
+  cursor-gemini-flash:
+    type: subprocess
+    command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: gemini-flash-2.5-flash
+
+
+
+# -------------
+# AGENT ROLES
+# -------------
+
+    # Builder used by ras implement.
+builder:
+  #   command: ["cursor", "agent", "--print", "--trust", "--yolo", "--model", "{model}"]
+  #   model: composer-2.5-fast
+  command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
+  #   command: ["/Users/josh/.local/bin/claude-p", "--permission-mode", "bypassPermissions"]
+  #   command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "grok-composer-2.5-fast"]
+  timeout: 60m
+    # Optional instructions included in every builder prompt.
+    # instructions: |
+    #   Run project checks before declaring done.
+
+# Agent used to synthesize the final review after reviewer/adjudication rounds.
+synthesis:
+  agent: codex
+
+# Agent used to score experiment cells. If unset, ras uses synthesis.agent.
+evaluation:
+  agent: codex
+
+
+# ------------------------
+# PROFILE CONFIGURATIONS
+# ------------------------
 
 # Optional named model profiles. A selected profile supplies the default
 # multi-agent panel and per-agent models for review-like workflows.
@@ -33,6 +103,13 @@ model_profiles:
       - name: codex
       - name: claude
       - name: agy
+      - name: grok
+      - name: cursor
+#   fast-review:
+#     agents:
+#       - name: agy
+#       - name: grok
+#       - name: cursor
 # model_profiles:
 #   deep-review:
 #     agents:
@@ -49,13 +126,9 @@ model_profiles:
 #     builder:
 #       model: gpt-5.3-codex
 
-# Agent used to synthesize the final review after reviewer/adjudication rounds.
-synthesis:
-  agent: claude
-
-# Agent used to score experiment cells. If unset, ras uses synthesis.agent.
-evaluation:
-  agent: codex
+#--------------------------
+# PIPELINE CONFIGURATIONS
+# -------------------------
 
 # Review pipeline controls.
 review:
@@ -95,29 +168,9 @@ review:
 # verify:
 #   model_profile: deep-review
 
-# Local read-only web UI.
-serve:
-  addr: 127.0.0.1:1948
-  # Optional aggregate mode inputs.
-  # workspaces:
-  #   - ..
-  # projects:
-  #   - ../other-project
-
-# Builder used by ras implement. The default builder is codex.
-builder:
-#   command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
-  command: ["/Users/josh/.local/bin/claude-p", "--permission-mode", "bypassPermissions"]
-  # Optional fallback builder model when no builder model profile is selected.
-  # model: gpt-5.3-codex
-  timeout: 60m
-  # Optional instructions included in every builder prompt.
-  # instructions: |
-  #   Run project checks before declaring done.
-
 # Implement-loop controls for ras implement.
 implement:
-  # default_mode: pr
+  default_mode: pr
   # PR-backed mode options used when default_mode is pr or --open-pr is passed.
   pr_remote: origin
   # pr_base: main
