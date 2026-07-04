@@ -8,3 +8,9 @@ broot/.config/broot/launcher/
 
 # Anaconda
 conda/
+
+# Local RAS runtime files
+/ras/.config/ras/.ras/
+/ras/.config/ras/ras.sqlite
+/ras/.config/ras/config.yaml.bak
+worktrees/
