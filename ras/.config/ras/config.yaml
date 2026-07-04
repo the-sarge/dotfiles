@@ -136,13 +136,13 @@ model_profiles:
       - name: agy-flash
       - name: agy-pro
       - name: grok-build
-      - name: grok-composer
+#       - name: grok-composer
       - name: cursor-composer
-      - name: cursor-grok-build
-      - name: cursor-grok
+#       - name: cursor-grok-build
+#       - name: cursor-grok
       - name: cursor-opus
       # - name: cursor-fable
-      - name: cursor-glm      
+#       - name: cursor-glm      
 #   fast-review:
 #     agents:
 #       - name: agy-flash
