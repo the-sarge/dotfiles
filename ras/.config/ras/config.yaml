@@ -28,42 +28,72 @@ agents:
     # env adds process environment variables for this agent.
     # env:
     #   EXAMPLE: value
-  claude:
+  claude-opus:
     type: subprocess
     command: ["claude", "-p", "--model", "{model}", "--effort", "xhigh", "--permission-mode", "bypassPermissions"]
     model: opus
     # timeout_seconds: 900
-  agy:
+  claude-fable:
     type: subprocess
-    command: ["agy", "--dangerously-skip-permissions", "--print", "--print-timeout", "15m"]
-    # model: <name>  # run: agy models
+    command: ["claude", "-p", "--model", "{model}", "--effort", "high", "--permission-mode", "bypassPermissions"]
+    model: fable
     # timeout_seconds: 900
-  grok:
+  agy-flash:
+    type: subprocess
+    command: ["agy", "--dangerously-skip-permissions", "--print", "--print-timeout", "15m", "--model", "{model}"]
+    model: "Gemini 3.5 Flash (High)"
+    # timeout_seconds: 900
+  agy-pro:
+    type: subprocess
+    command: ["agy", "--dangerously-skip-permissions", "--print", "--print-timeout", "15m", "--model", "{model}"]
+    model: "Gemini 3.1 Pro (High)"
+    # timeout_seconds: 900
+  grok-build:
     type: subprocess
     command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "{model}"]
     model: grok-build
     # timeout_seconds: 900
-  cursor:
+  grok-composer:
     type: subprocess
-    command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "{model}"]
+    model: grok-composer-2.5-fast
+    # timeout_seconds: 900
+  cursor-composer:
+    type: subprocess
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
     model: composer-2.5-fast
-  # cursor-gpt:
-  #   type: subprocess
-  #   command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
-  #   model: gpt5.5
-  # cursor-opus:
-  #   type: subprocess
-  #   command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
-  #   model: opus4.8
-  # cursor-grok:
-  #   type: subprocess
-  #   command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
-  #   model: grok4.3
+  cursor-gpt:
+    type: subprocess
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: gpt-5.5-extra-high
+  cursor-opus:
+    type: subprocess
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: claude-opus-4-8-thinking-xhigh
+  cursor-fable:
+    type: subprocess
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: claude-fable-5-thinking-high
+  cursor-grok:
+    type: subprocess
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: grok-4.3
+  cursor-grok-build:
+    type: subprocess
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: grok-build-0.1
   cursor-gemini-flash:
     type: subprocess
-    command: ["cursor", "agent", "-p", "--trust", "--yolo", "--model", "{model}"]
-    model: gemini-flash-2.5-flash
-
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: gemini-flash-3.5-flash
+  cursor-gemini-pro:
+    type: subprocess
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: gemini-3.1-pro
+  cursor-glm:
+    type: subprocess
+    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    model: glm-5.2-high
 
 
 # -------------
@@ -72,7 +102,7 @@ agents:
 
     # Builder used by ras implement.
 builder:
-  #   command: ["cursor", "agent", "--print", "--trust", "--yolo", "--model", "{model}"]
+  #   command: ["cursor-agent", "--print", "--trust", "--yolo", "--model", "{model}"]
   #   model: composer-2.5-fast
   command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
   #   command: ["/Users/josh/.local/bin/claude-p", "--permission-mode", "bypassPermissions"]
@@ -101,30 +131,38 @@ model_profiles:
   default-review:
     agents:
       - name: codex
-      - name: claude
-      - name: agy
-      - name: grok
-      - name: cursor
+      # - name: claude-opus
+      # - name: claude-fable
+      - name: agy-flash
+      - name: agy-pro
+      - name: grok-build
+      - name: grok-composer
+      - name: cursor-composer
+      - name: cursor-grok-build
+      - name: cursor-grok
+      - name: cursor-opus
+      # - name: cursor-fable
+      - name: cursor-glm      
 #   fast-review:
 #     agents:
-#       - name: agy
-#       - name: grok
-#       - name: cursor
+#       - name: agy-flash
+#       - name: cursor-composer
 # model_profiles:
 #   deep-review:
 #     agents:
 #       - name: codex
 #         model: gpt-5.5
 #       - name: claude
-#         model: opus
+#         model: fable
 #     synthesis:
-#       agent: claude
-#       model: opus
+#       agent: codex
+#       model: gpt-5.5
 #     verify:
-#       agent: claude
-#       model: opus
+#       agent: codex
+#       model: gpt-5.5
 #     builder:
-#       model: gpt-5.3-codex
+#       agent: codex
+#       model: gpt-5.5
 
 #--------------------------
 # PIPELINE CONFIGURATIONS
@@ -166,7 +204,7 @@ review:
 # consider:
 #   model_profile: deep-review
 # verify:
-#   model_profile: deep-review
+#   model_profile: fast-review
 
 # Implement-loop controls for ras implement.
 implement:
@@ -180,10 +218,10 @@ implement:
   max_review_loops: 3
   max_fix_loops: 3
   # Optional role-specific profiles for PR-backed implementation loops.
-  # builder_model_profile: deep-review
-  # review_model_profile: deep-review
-  # verify_model_profile: deep-review
-  # gate_model_profile: deep-review
+  # builder_model_profile: review
+  # review_model_profile: review
+  # verify_model_profile: fast-review
+  # gate_model_profile: review
   # PR-backed builders use a scrubbed environment by default.
   # pr_builder_inherit_env: false
   stuck_threshold: 3
