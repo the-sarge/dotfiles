@@ -2,6 +2,7 @@
 typeset -U path
 _zshenv_tool_dirs=()
 for _zshenv_tool_dir in \
+	"$HOME/.local/bin" \
 	/opt/homebrew/bin /opt/homebrew/sbin \
 	/usr/local/bin /usr/local/sbin \
 	/opt/local/bin /opt/local/sbin; do
