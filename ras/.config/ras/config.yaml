@@ -140,7 +140,7 @@ model_profiles:
       - name: cursor-composer
 #       - name: cursor-grok-build
 #       - name: cursor-grok
-      - name: cursor-opus
+#       - name: cursor-opus
       # - name: cursor-fable
 #       - name: cursor-glm      
 #   fast-review:
