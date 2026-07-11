@@ -1,0 +1,61 @@
+#!/opt/homebrew/bin/python3
+import fcntl
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+REAL_AGY = os.environ.get("AGY_REAL", str(Path.home() / ".local/bin/agy"))
+STATE_DIR = Path.home() / ".gemini/antigravity-cli"
+TOKEN_FILE = STATE_DIR / "antigravity-oauth-token"
+LOCK_FILE = STATE_DIR / "agy-ras.lock"
+
+# Workaround for google-antigravity/antigravity-cli#24: SSH-mode agy can fail to reuse auth when this shared token file is malformed.
+# Remove after raw parallel `agy --print` runs no longer corrupt or reject the token file.
+
+
+def repair_token_if_safe() -> None:
+    if not TOKEN_FILE.exists():
+        return
+
+    text = TOKEN_FILE.read_text(errors="replace")
+    try:
+        json.loads(text)
+        return
+    except json.JSONDecodeError:
+        pass
+
+    try:
+        _, end = json.JSONDecoder().raw_decode(text)
+    except json.JSONDecodeError as exc:
+        print(f"agy-ras: token file is corrupt and not mechanically repairable: {exc}", file=sys.stderr)
+        sys.exit(2)
+
+    trailing = text[end:]
+    if trailing != "}":
+        print(
+            f"agy-ras: token file has unexpected trailing data after JSON ({len(trailing)} bytes); refusing to repair",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    TOKEN_FILE.write_text(text[:end])
+    os.chmod(TOKEN_FILE, 0o600)
+    print(f"agy-ras: repaired extra trailing brace in {TOKEN_FILE}", file=sys.stderr)
+
+
+def main() -> int:
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    with LOCK_FILE.open("a") as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        repair_token_if_safe()
+        try:
+            return subprocess.run([REAL_AGY, *sys.argv[1:]]).returncode
+        except FileNotFoundError:
+            print(f"agy-ras: real agy not found at {REAL_AGY}", file=sys.stderr)
+            return 127
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
