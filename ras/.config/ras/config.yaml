@@ -56,12 +56,12 @@ agents:
   grok-composer:
     type: subprocess
     command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "{model}"]
-    model: grok-composer-2.5-fast
+    model: grok-composer-2.5
     # timeout_seconds: 900
   cursor-composer:
     type: subprocess
     command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
-    model: composer-2.5-fast
+    model: composer-2.5
   cursor-gpt:
     type: subprocess
     command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
@@ -131,13 +131,13 @@ model_profiles:
   default-review:
     agents:
       - name: codex
-#       - name: claude-opus
-      - name: claude-fable
+      - name: claude-opus
+#       - name: claude-fable
 #       - name: agy-flash  # SSH token guarded by agy-ras lock/repair wrapper
 #       - name: agy-pro    # after agy-flash; agy-ras serializes agy sessions for token safety
       - name: grok
 #       - name: grok-composer
-      - name: cursor-composer
+#       - name: cursor-composer
 #       - name: cursor-grok
 #       - name: cursor-opus
       # - name: cursor-fable

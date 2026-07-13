@@ -8,6 +8,7 @@
 	excludesfile = ~/.gitignore
 	editor = hx
 	pager = less -FRX
+	sshCommand = ssh -o StrictHostKeyChecking=ask
 
 [init]
 	defaultBranch = main
