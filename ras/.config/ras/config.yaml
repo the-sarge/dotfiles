@@ -50,12 +50,12 @@ agents:
     # timeout_seconds: 900
   grok:
     type: subprocess
-    command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "{model}"]
+    command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "high", "-m", "{model}"]
     model: grok-4.5
     # timeout_seconds: 900
   grok-composer:
     type: subprocess
-    command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "{model}"]
+    command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "-m", "{model}"]
     model: grok-composer-2.5
     # timeout_seconds: 900
   cursor-composer:
