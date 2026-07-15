@@ -1,11 +1,11 @@
 name: CI
 
-# Keep PR certification dispatch-only. Add a default-branch push trigger only when repository protection or deployment evidence requires it.
+# Keep PR validation dispatch-only. The agent-side review decision is not GitHub workflow state. Add a default-branch push trigger only when repository protection or deployment evidence requires it.
 on:
   workflow_dispatch:
     inputs:
       expected_sha:
-        description: Exact RAS-reviewed head SHA to certify
+        description: Exact PR head SHA the operator intends to validate
         required: true
         type: string
       base_sha:
@@ -28,13 +28,14 @@ jobs:
       docs_only: ${{ steps.changes.outputs.docs_only }}
       source_changed: ${{ steps.changes.outputs.source_changed }}
     steps:
-      - name: Require the RAS-reviewed head
+      # This is a race/ref-integrity guard, not proof of any external review verdict.
+      - name: Require the requested head
         if: ${{ github.event_name == 'workflow_dispatch' }}
         env:
           EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
           test "$GITHUB_SHA" = "$EXPECTED_SHA" || {
-            printf 'error: dispatched head %s does not match RAS-reviewed head %s\n' "$GITHUB_SHA" "$EXPECTED_SHA" >&2
+            printf 'error: dispatched head %s does not match requested head %s\n' "$GITHUB_SHA" "$EXPECTED_SHA" >&2
             exit 1
           }
       # Replace action tags and tool versions with repository-approved immutable pins.

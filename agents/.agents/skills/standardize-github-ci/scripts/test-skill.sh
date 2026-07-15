@@ -7,6 +7,14 @@ classify="$skill_root/assets/classify-ci-changes.sh"
 require_results="$skill_root/assets/require-ci-results.sh"
 workflow_template="$skill_root/assets/ci.yml.template"
 
+rg -q 'Keep GitHub review-system agnostic by default' "$skill_root/SKILL.md"
+rg -q 'race and ref-integrity guards, not proof' "$skill_root/SKILL.md"
+rg -q 'gh pr merge --match-head-commit <exact-pr-head>' "$skill_root/references/migration.md"
+if rg -q 'RAS|reviewed' "$workflow_template"; then
+  printf 'error: workflow template unexpectedly exposes agent-side review state\n' >&2
+  exit 1
+fi
+
 command -v yq >/dev/null || {
   printf 'error: yq is required to validate the workflow template\n' >&2
   exit 1
@@ -106,7 +114,7 @@ on:
   workflow_dispatch:
     inputs:
       expected_sha:
-        description: Exact reviewed head
+        description: Exact requested head
         required: true
         type: string
 jobs:

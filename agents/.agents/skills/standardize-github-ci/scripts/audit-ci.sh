@@ -272,7 +272,7 @@ while IFS= read -r workflow; do
   if test "$pr_activity_state" = 'automatic updates' || test "$pr_target_state" != absent; then
     automatic_pr_workflow_count=$((automatic_pr_workflow_count + 1))
     if test "$uses_ras" = true; then
-      append_signal "RAS-COST $rel: automatically starts on pull request updates before the RAS gate settles; separate preflight or use dispatch-gated certification"
+      append_signal "RAS-COST $rel: automatically starts on pull request updates before the agent-side review gate settles; separate preflight or use dispatch-gated validation"
     fi
   fi
   if test "$uses_ras" = true && test "$pr_activity_state" = 'label-only operator trigger' && test "$label_certification" != 'detected; verify label revocation and head/base/merge comparisons fail closed'; then
@@ -297,7 +297,7 @@ if test "$uses_ras" = true && test "$exact_head_dispatch_count" -eq 0 && test "$
   fi
 fi
 
-printf '## RAS sequencing\n\n'
+printf '## Agent-side review sequencing\n\n'
 printf -- '- Automatic pull-request workflows: `%s`\n' "$automatic_pr_workflow_count"
 printf -- '- Manual-dispatch workflows: `%s`\n' "$manual_workflow_count"
 printf -- '- Exact-head dispatch candidates: `%s`\n' "$exact_head_dispatch_count"
@@ -325,4 +325,4 @@ else
   done <<< "$signals"
 fi
 
-printf '\nThis report is read-only and mechanical. Confirm required checks, changed-file semantics, recent runs, billing, private dependencies, generated docs, platform constraints, and any RAS-reviewed-to-dispatched SHA handoff separately.\n'
+printf '\nThis report is read-only and mechanical. Confirm required checks, changed-file semantics, recent runs, billing, private dependencies, generated docs, platform constraints, and the agent-side review-to-dispatch-and-merge handoff separately.\n'
