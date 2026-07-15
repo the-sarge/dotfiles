@@ -176,7 +176,7 @@ review:
   #   and release-readiness perspectives.
 
   # Per-agent timeout in seconds unless an agent-specific timeout is set.
-  timeout_seconds: 1200
+  timeout_seconds: 1800
 
   # Run R2/R3 adjudication over reviewer findings before synthesis.
   adjudication: true
