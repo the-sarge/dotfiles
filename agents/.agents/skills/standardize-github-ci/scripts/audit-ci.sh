@@ -196,10 +196,22 @@ label_certification_state() {
   fi
 }
 
+dispatch_status_bridge_state() {
+  workflow="$1"
+  permissions_json="$(yq -o=json -I=0 '[.permissions.statuses // "", (.jobs // {} | to_entries[] | .value.permissions.statuses // "")]' "$workflow")"
+  jobs_json="$(yq -o=json -I=0 '.jobs // {}' "$workflow")"
+  if printf '%s\n' "$permissions_json" | rg -q '"write"' && printf '%s\n' "$jobs_json" | rg -Fq '/statuses/' && printf '%s\n' "$jobs_json" | rg -Fq 'ci-required'; then
+    printf 'detected; verify PR ruleset attribution live'
+  else
+    printf 'not detected'
+  fi
+}
+
 manual_workflow_count=0
 automatic_pr_workflow_count=0
 exact_head_dispatch_count=0
 label_certification_count=0
+status_bridge_count=0
 
 while IFS= read -r workflow; do
   test -n "$workflow" || continue
@@ -236,6 +248,11 @@ while IFS= read -r workflow; do
     printf -- '- Exact-head dispatch binding: `%s`\n' "$dispatch_sha_binding"
     if test "$dispatch_sha_binding" != 'not detected'; then
       exact_head_dispatch_count=$((exact_head_dispatch_count + 1))
+    fi
+    dispatch_status_bridge="$(dispatch_status_bridge_state "$workflow")"
+    printf -- '- Generic commit-status bridge: `%s`\n' "$dispatch_status_bridge"
+    if test "$dispatch_status_bridge" != 'not detected'; then
+      status_bridge_count=$((status_bridge_count + 1))
     fi
   fi
   label_certification="$(label_certification_state "$workflow")"
@@ -295,13 +312,16 @@ if test "$uses_ras" = true && test "$exact_head_dispatch_count" -eq 0 && test "$
   else
     append_signal "RAS-BLOCKER repository: operator-triggered certification exists but no exact-head binding evidence was detected"
   fi
+elif test "$uses_ras" = true && test "$exact_head_dispatch_count" -gt 0 && test "$status_bridge_count" -eq 0; then
+  append_signal "RAS-VERIFY repository: exact-head dispatch has no generic commit-status bridge; GitHub may omit workflow_dispatch job checks from the PR required-status rollup, so prove live ruleset attribution before relying on it"
 fi
 
 printf '## Agent-side review sequencing\n\n'
 printf -- '- Automatic pull-request workflows: `%s`\n' "$automatic_pr_workflow_count"
 printf -- '- Manual-dispatch workflows: `%s`\n' "$manual_workflow_count"
 printf -- '- Exact-head dispatch candidates: `%s`\n' "$exact_head_dispatch_count"
-printf -- '- Label-gated certification candidates: `%s`\n\n' "$label_certification_count"
+printf -- '- Label-gated certification candidates: `%s`\n' "$label_certification_count"
+printf -- '- Generic commit-status bridges: `%s`\n\n' "$status_bridge_count"
 
 printf '## Cross-file duplication signals\n\n'
 search_files=("$workflow_dir")

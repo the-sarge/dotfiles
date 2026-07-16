@@ -13,7 +13,7 @@ Answer these before implementation:
 7. Which jobs publish, deploy, sign, attest, comment, or otherwise mutate external state?
 8. What recent changes produced unnecessary runs, and what would the proposed classifier do with them?
 9. Is RAS the pre-merge review gate, what constitutes a blocker-free result, and how is the reviewed head SHA recorded?
-10. Can `workflow_dispatch` or an equivalent operator trigger produce the required GitHub-Actions check on a same-repository PR head?
+10. Can `workflow_dispatch` or an equivalent operator trigger produce a required result on a same-repository PR head that the live PR status rollup and ruleset actually credit, or is a generic commit-status bridge required?
 11. Does the repository trust the agent/operator and same-repository branch writers, or does it explicitly require protection from malicious branch-controlled workflow changes?
 12. Does `base_sha` mean the current default-branch tip, the PR merge base, or a merge-queue synthetic SHA, and which changes invalidate prior review/CI?
 13. Is a merge queue enabled, and if so how does its synthetic SHA interact with exact-head validation and merge?
@@ -24,7 +24,7 @@ Use this pattern when the agent runs RAS or another review process before paid C
 
 1. Preserve the stable required check and its result aggregation.
 2. Remove automatic open and synchronize certification from `pull_request` and `pull_request_target`; remove event-specific branches that become unreachable.
-3. Preserve or add `workflow_dispatch` with a full or otherwise fail-closed validation mode. Use generic `expected_sha` and `base_sha` inputs plus an early equality check when practical; regardless, the agent must inspect the resulting run's head SHA before accepting it.
+3. Preserve or add `workflow_dispatch` with a full or otherwise fail-closed validation mode. Use generic `expected_sha` and `base_sha` inputs plus an early equality check when practical; regardless, the agent must inspect the resulting run's head SHA before accepting it. Do not assume a dispatched job check satisfies a PR ruleset: verify the PR status rollup, and if necessary publish a generic required commit status as pending after binding and success or failure after aggregate evaluation.
 4. Keep automatic PR preflight separate and non-required if repository evidence justifies it. Do not let skipped certification jobs report success before the agent requests CI.
 5. By default, the agent captures the exact PR head and current default-branch tip, runs and resolves RAS outside GitHub, rechecks both live SHAs, dispatches CI on the same-repository PR branch, inspects the run and required check, rechecks the PR head/base, and merges with an exact-head guard. A new PR commit or default-branch advance invalidates the prior decision and CI result unless the repository explicitly documents and tests merge-base or merge-queue semantics.
 6. Keep complete default-branch validation until rulesets prohibit direct pushes; then consider reducing the post-merge run separately.
@@ -49,7 +49,7 @@ The label and workflow must be generic CI coordination with no RAS meaning. The 
 
 Task is an optional agent interface, not a GitHub-side RAS gate. A target such as `task validate-pr PR=<n>` may capture the head, run RAS, inspect structured synthesis, recheck the live head, dispatch CI, inspect the run, and merge the same head, but must not request CI merely because `ras review` exited zero.
 
-Do not add labels, webhooks, repository-dispatch integrations, or custom status publishers unless the user wants operator coordination or repository evidence requires enforcement beyond the required check. A persistent label is insufficient unless automation revokes it or otherwise SHA-binds it.
+Do not add labels, webhooks, repository-dispatch integrations, or statuses to communicate the review tool or verdict. A generic required commit-status publisher is permitted when live repository evidence shows that GitHub does not credit dispatched job checks; it must report CI progress/result only, use least-privilege `statuses: write`, link to the dispatched run, and fail closed. A persistent operator label is insufficient unless automation revokes it or otherwise SHA-binds it.
 
 ## Bootstrap
 
@@ -66,7 +66,7 @@ Existing open PR heads may retain successful required checks produced before the
 5. Observe failures, queue time, and billing for at least several normal development cycles.
 6. Tighten path categories only from evidence; fail closed when uncertain.
 7. Record the agent-reviewed SHA, dispatched run SHA, required check producer, check conclusion, live PR head before merge, and merged SHA for the first live validation.
-8. Roll back by restoring the prior PR trigger if dispatch cannot reliably produce the required check; do not weaken or remove the required check merely to unblock merging.
+8. If dispatch cannot reliably produce a ruleset-credited required result, stop the rollout and repair the generic status bridge or choose another explicit agent-requested trigger. Restore the prior PR trigger only if that matches the user's requested operating model; never weaken or remove the required result merely to unblock merging.
 
 ## Exceptions
 
