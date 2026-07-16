@@ -96,7 +96,7 @@ jobs:
       - run: go run github.com/go-task/task/v3/cmd/task@v3.51.1 check
 
   ci-required:
-    name: ci-required
+    name: ${{ github.event_name == 'workflow_dispatch' && 'ci-dispatch-aggregate' || 'ci-required' }}
     if: ${{ !cancelled() }}
     needs: [classify, docs, code]
     permissions:
@@ -117,7 +117,7 @@ jobs:
           CODE_RESULT: ${{ needs.code.result }}
         run: ./scripts/require-ci-results.sh
       - name: Publish requested CI result
-        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
+        if: ${{ always() && !cancelled() && github.event_name == 'workflow_dispatch' }}
         env:
           CI_API_URL: ${{ github.api_url }}
           CI_EXPECTED_SHA: ${{ inputs.expected_sha }}

@@ -29,6 +29,8 @@ rg -Fq '/statuses/${CI_EXPECTED_SHA}' "$workflow_template"
 rg -q 'name: Mark requested CI pending' "$workflow_template"
 rg -q 'name: Publish requested CI result' "$workflow_template"
 rg -q 'CI_STATUS_STATE:.*steps.verify.outcome' "$workflow_template"
+rg -Fq "name: \${{ github.event_name == 'workflow_dispatch' && 'ci-dispatch-aggregate' || 'ci-required' }}" "$workflow_template"
+rg -Fq "if: \${{ always() && !cancelled() && github.event_name == 'workflow_dispatch' }}" "$workflow_template"
 if command -v actionlint >/dev/null; then
   actionlint "$workflow_template"
 fi
