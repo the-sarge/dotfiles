@@ -40,12 +40,12 @@ agents:
     # timeout_seconds: 900
   agy-flash:
     type: subprocess
-    command: ["agy-ras", "--dangerously-skip-permissions", "--print", "--print-timeout", "15m", "--model", "{model}"]
+    command: ["agy-ras", "--ras-stdin", "--dangerously-skip-permissions", "--print-timeout", "15m", "--model", "{model}"]
     model: "Gemini 3.5 Flash (High)"
     # timeout_seconds: 900
   agy-pro:
     type: subprocess
-    command: ["agy-ras", "--dangerously-skip-permissions", "--print", "--print-timeout", "15m", "--model", "{model}"]
+    command: ["agy-ras", "--ras-stdin", "--dangerously-skip-permissions", "--print-timeout", "15m", "--model", "{model}"]
     model: "Gemini 3.1 Pro (High)"
     # timeout_seconds: 900
   grok:

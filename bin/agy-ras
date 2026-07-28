@@ -10,6 +10,8 @@ REAL_AGY = os.environ.get("AGY_REAL", str(Path.home() / ".local/bin/agy"))
 STATE_DIR = Path.home() / ".gemini/antigravity-cli"
 TOKEN_FILE = STATE_DIR / "antigravity-oauth-token"
 LOCK_FILE = STATE_DIR / "agy-ras.lock"
+RAS_STDIN_FLAG = "--ras-stdin"
+PROMPT_FLAGS = {"--print", "--prompt", "-p"}
 
 # Workaround for google-antigravity/antigravity-cli#24: SSH-mode agy can fail to reuse auth when this shared token file is malformed.
 # Remove after raw parallel `agy --print` runs no longer corrupt or reject the token file.
@@ -29,7 +31,10 @@ def repair_token_if_safe() -> None:
     try:
         _, end = json.JSONDecoder().raw_decode(text)
     except json.JSONDecodeError as exc:
-        print(f"agy-ras: token file is corrupt and not mechanically repairable: {exc}", file=sys.stderr)
+        print(
+            f"agy-ras: token file is corrupt and not mechanically repairable: {exc}",
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     trailing = text[end:]
@@ -45,13 +50,47 @@ def repair_token_if_safe() -> None:
     print(f"agy-ras: repaired extra trailing brace in {TOKEN_FILE}", file=sys.stderr)
 
 
+def prepare_invocation() -> tuple[list[str], int | None]:
+    args = sys.argv[1:]
+    ras_stdin_count = args.count(RAS_STDIN_FLAG)
+    if ras_stdin_count == 0:
+        return args, None
+    if ras_stdin_count > 1:
+        print(f"agy-ras: {RAS_STDIN_FLAG} may be specified only once", file=sys.stderr)
+        raise SystemExit(2)
+
+    args.remove(RAS_STDIN_FLAG)
+    if any(
+        arg in PROMPT_FLAGS
+        or arg.startswith("--print=")
+        or arg.startswith("--prompt=")
+        or arg.startswith("-p=")
+        for arg in args
+    ):
+        print(
+            f"agy-ras: {RAS_STDIN_FLAG} conflicts with an explicit prompt",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
+
+    prompt = sys.stdin.read()
+    if prompt == "":
+        print(
+            f"agy-ras: {RAS_STDIN_FLAG} received an empty stdin prompt", file=sys.stderr
+        )
+        raise SystemExit(2)
+
+    return [*args, "--print", prompt], subprocess.DEVNULL
+
+
 def main() -> int:
+    args, child_stdin = prepare_invocation()
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     with LOCK_FILE.open("a") as lock:
         fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
         repair_token_if_safe()
         try:
-            return subprocess.run([REAL_AGY, *sys.argv[1:]]).returncode
+            return subprocess.run([REAL_AGY, *args], stdin=child_stdin).returncode
         except FileNotFoundError:
             print(f"agy-ras: real agy not found at {REAL_AGY}", file=sys.stderr)
             return 127
