@@ -18,7 +18,7 @@ It does not post to GitHub unless `--post` is passed or the user later runs `ras
 
 Use one-shot review as the default first move when a PR touches an approach-defining area and a likely finding could invalidate the implementation strategy. Examples include shell job control or process groups, concurrency/lifecycle orchestration, security/auth boundaries, migrations or data loss, parser or protocol changes, major dependency choices, and broad architecture/API shape changes.
 
-When the synthesis contains a critical or high finding that appears to attack the foundation, first validate it against the code and accepted work contract using the shared [finding-disposition policy](../_shared/REVIEW-LOOP.md). Do not automatically route it into `ras review-fix` or ask a builder to preserve the design. Use `stop-for-decision` only when the finding demonstrates that the accepted outcome cannot be completed safely inside its boundary; otherwise classify it as `fix-now`, `defer`, or `reject`.
+When the synthesis contains a critical or high finding that appears to attack the foundation, first validate it against the code and accepted work contract using the shared [finding-disposition](../_shared/REVIEW-LOOP.md#finding-disposition) and [approach-stop](../_shared/REVIEW-LOOP.md#approach-stops) policies. Do not automatically route it into `ras review-fix` or ask a builder to preserve the design.
 
 ## Before Running
 
@@ -79,7 +79,7 @@ stated as "two regressions: must fail if X, must fail if Y" as "X and Y hold
 generally" converts a bounded obligation into an open one, and the resulting
 findings are correct against the text supplied.
 
-A useful prompt states four things:
+A useful prompt composes the shared [review briefing](../_shared/REVIEW-LOOP.md#review-briefing) with these mechanics:
 
 - **Criteria, verbatim.** Copy the acceptance criteria from their source.
 - **Ceilings, not only prohibitions.** Where a criterion names the regressions
@@ -87,15 +87,10 @@ A useful prompt states four things:
   named regression belongs under follow-ups, not `Fix First`. Prohibitions alone
   bound the directions you already anticipated; ceilings bound the ones you did
   not.
-- **Artifact versus aid.** Name what ships. Findings against CI guards, test
-  scaffolding, fixtures, and PR prose are worth less than findings against
-  shipped code, and saying so keeps review effort proportionate.
 - **What is already settled.** For a later round, list what prior rounds closed,
   with run ids and head SHAs, so a fresh review does not relitigate it.
 
-For a repeat review, also state the round number and any declared shape of the
-change, such as a slice specified as net deletion. A reviewer told that a
-deletion has grown can weigh findings that reduce surface.
+For a replacement review permitted by the baseline, also state the round number and any declared shape of the change, such as a slice specified as net deletion. A reviewer told that a deletion has grown can weigh findings that reduce surface.
 
 Derive the prompt from the source document mechanically. Composing it freehand
 from memory of the contract reintroduces the paraphrase problem the file exists
@@ -117,7 +112,7 @@ Use `--no-adjudication` only when the user explicitly wants faster, less process
 
 Wait for the command to finish and read the final synthesis. Do not treat a quiet run or an exit code alone as a clean review.
 
-RAS severities, `Fix First`, `Do Not Act On`, required fixes, and verification commands are proposed classifications, not workflow commands. For a review-only request, report them without mutation. Before any later mutation, the implementing agent must inspect the cited code and apply the shared [finding-disposition policy](../_shared/REVIEW-LOOP.md). Do not perform sibling-family analysis or contract closure until a finding qualifies as `fix-now`.
+RAS severities, `Fix First`, `Do Not Act On`, required fixes, and verification commands are proposed classifications, not workflow commands. For a review-only request, report them without mutation. Before any later mutation, the implementing agent must inspect the cited code and apply the shared [finding-disposition policy](../_shared/REVIEW-LOOP.md). Do not perform semantic sibling-family analysis or contract closure until a finding qualifies as `fix-now`, and do not treat representation aliases as semantic siblings.
 
 Separate agents may run other plain `ras review` commands against different PRs in the same repository while this review is running. RAS gives each review its own run id, run directory, and disposable worktrees, though very large parallel batches can still contend on shared SQLite and Git worktree locks.
 
@@ -138,6 +133,8 @@ Apply the shared review loop's severity-independent low/nit policy when judging 
 If independent disposition produces `stop-for-decision`, summarize the operator choice: abandon or redesign, patch in place with an expanded contract, or split follow-up work. Do not escalate merely because RAS used critical/high severity, and do not silently fix a valid but adjacent issue.
 
 If the user asks to fix findings after a review, do not silently start a complete loop. Independently disposition the findings, fix only the `fix-now` set as requested, and use `ras-review-loop` only when they ask for review/fix/verify iteration. Follow the shared automated-fixer safety policy.
+
+When the review is part of a manual loop, apply the shared [approach stops](../_shared/REVIEW-LOOP.md#approach-stops) and [bounded review algorithm](../_shared/REVIEW-LOOP.md#bounded-review-algorithm) to its result.
 
 ## Safety Notes
 
