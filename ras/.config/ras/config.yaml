@@ -20,79 +20,91 @@ serve:
 # passed.
 agents:
   codex:
-    type: subprocess
-    command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
-    #model: gpt-5.6-sol
+    preset: codex
+    model: gpt-5.6-sol
+    structured_delivery: prompt_only
     # timeout_seconds overrides review.timeout_seconds for this agent.
     # timeout_seconds: 900
     # env adds process environment variables for this agent.
     # env:
     #   EXAMPLE: value
+  codex-sol:
+    preset: codex
+    model: gpt-5.6-sol
+    reasoning_effort_control: codex_config
+    reasoning_effort: high
+    structured_delivery: prompt_only
+  luna-max:
+    preset: codex
+    model: gpt-5.6-luna
+    reasoning_effort_control: codex_config
+    reasoning_effort: max
+    structured_delivery: prompt_only
   claude-opus:
     type: subprocess
-    command: ["claude", "-p", "--model", "{model}", "--effort", "xhigh", "--permission-mode", "bypassPermissions"]
+    command: ["claude", "--model", "{model}", "--effort", "high", "--permission-mode", "bypassPermissions", "-p"]
     model: opus
     # timeout_seconds: 900
   claude-fable:
     type: subprocess
-    command: ["claude", "-p", "--model", "{model}", "--effort", "high", "--permission-mode", "bypassPermissions"]
+    command: ["claude", "--model", "{model}", "--effort", "high", "--permission-mode", "bypassPermissions", "-p"]
     model: fable
     # timeout_seconds: 900
   agy-flash:
     type: subprocess
     command: ["agy-ras", "--ras-stdin", "--dangerously-skip-permissions", "--print-timeout", "15m", "--model", "{model}"]
-    model: "Gemini 3.5 Flash (High)"
+    model: gemini-3.6-flash-high
     # timeout_seconds: 900
   agy-pro:
     type: subprocess
     command: ["agy-ras", "--ras-stdin", "--dangerously-skip-permissions", "--print-timeout", "15m", "--model", "{model}"]
-    model: "Gemini 3.1 Pro (High)"
+    model: gemini-3.1-pro-high
     # timeout_seconds: 900
   grok:
     type: subprocess
-    command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "high", "-m", "{model}"]
+    command: ["grok", "--always-approve", "--effort", "high", "-m", "{model}", "--prompt-file", "/dev/stdin"]
     model: grok-4.5
     # timeout_seconds: 900
   grok-composer:
     type: subprocess
-    command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "-m", "{model}"]
+    command: ["grok", "--always-approve", "-m", "{model}", "--prompt-file", "/dev/stdin"]
     model: grok-composer-2.5
     # timeout_seconds: 900
   cursor-composer:
     type: subprocess
-    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: composer-2.5
   cursor-gpt:
     type: subprocess
-    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: gpt-5.5-extra-high
   cursor-opus:
     type: subprocess
-    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: claude-opus-4-8-thinking-xhigh
   cursor-fable:
     type: subprocess
-    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: claude-fable-5-thinking-high
   cursor-grok:
     type: subprocess
-    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: grok-4.5-xhigh
 #   cursor-grok-build:
 #     type: subprocess
-#     command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+#     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
 #     model: grok-build-0.1
   cursor-gemini-flash:
     type: subprocess
-    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: gemini-3.5-flash
   cursor-gemini-pro:
     type: subprocess
-    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: gemini-3.1-pro
   cursor-glm:
     type: subprocess
-    command: ["cursor-agent", "-p", "--trust", "--yolo", "--model", "{model}"]
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: glm-5.2-high
 
 
@@ -105,6 +117,7 @@ builder:
   #   command: ["cursor-agent", "--print", "--trust", "--yolo", "--model", "{model}"]
   #   model: composer-2.5-fast
   command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
+  model: gpt-5.6-sol
   #   command: ["/Users/josh/.local/bin/claude-p", "--permission-mode", "bypassPermissions"]
   #   command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "grok-composer-2.5-fast"]
   timeout: 60m
@@ -114,11 +127,11 @@ builder:
 
 # Agent used to synthesize the final review after reviewer/adjudication rounds.
 synthesis:
-  agent: codex
+  agent: codex-sol
 
 # Agent used to score experiment cells. If unset, ras uses synthesis.agent.
 evaluation:
-  agent: codex
+  agent: codex-sol
 
 
 # ------------------------
@@ -130,29 +143,32 @@ evaluation:
 model_profiles:
   default-review:
     agents:
-      - name: codex
+      - name: codex-sol
+#       - name: luna-max
       - name: claude-opus
 #       - name: claude-fable
 #       - name: agy-flash  # SSH token guarded by agy-ras lock/repair wrapper
 #       - name: agy-pro    # after agy-flash; agy-ras serializes agy sessions for token safety
       - name: grok
 #       - name: grok-composer
-#       - name: cursor-composer
+      - name: cursor-composer
 #       - name: cursor-grok
 #       - name: cursor-opus
       # - name: cursor-fable
 #       - name: cursor-glm      
-#   fast-review:
-#     agents:
+  fast-review:
+    agents:
 #       - name: agy-flash
-#       - name: cursor-composer
-# model_profiles:
-#   deep-review:
-#     agents:
-#       - name: codex
-#         model: gpt-5.5
-#       - name: claude
+      - name: cursor-composer
+      - name: grok
+  deep-review:
+    agents:
+      - name: codex-sol
+      - name: luna-max
+      - name: claude-fable
 #         model: fable
+      - name: grok
+      - name: cursor-composer
 #     synthesis:
 #       agent: codex
 #       model: gpt-5.5
@@ -162,6 +178,11 @@ model_profiles:
 #     builder:
 #       agent: codex
 #       model: gpt-5.5
+  consider:
+    agents:
+      - name: codex-sol
+      - name: claude-fable
+      - name: grok
 
 #--------------------------
 # PIPELINE CONFIGURATIONS
@@ -176,7 +197,7 @@ review:
   #   and release-readiness perspectives.
 
   # Per-agent timeout in seconds unless an agent-specific timeout is set.
-  timeout_seconds: 1800
+  timeout_seconds: 3000
 
   # Run R2/R3 adjudication over reviewer findings before synthesis.
   adjudication: true
@@ -185,7 +206,7 @@ review:
   max_conflict_rounds: 2
 
   # Worktree retention policy: never, on_failure, or always.
-  keep_worktrees: on_failure
+  keep_worktrees: never
 
   # Minimum successful R1 reviewers required before adjudication/synthesis.
   min_successful_reviewers: 2
@@ -201,9 +222,9 @@ review:
 
 # consider and verify can select model profiles independently from review.
 consider:
-  model_profile: default-review
+  model_profile: consider
   # Per-agent timeout in seconds unless an agent-specific timeout is set.
-  timeout_seconds: 1800
+#   timeout_seconds: 1800
 # verify:
 #   model_profile: fast-review
 
