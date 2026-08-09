@@ -46,6 +46,7 @@ For repos whose artifacts are themselves security infrastructure (today: cpace o
 | Repo | Tier | Status (2026-08-05) |
 |---|---|---|
 | the-sarge/cpace | Hardened | Compliant (reference) |
+| the-sarge/ai-cli | Binary | Compliant: first verified release v0.2.0-rc.1 published 2026-08-09; publisher ran green, all 13 assets independently downloaded, 12 checksums passed, and all six arm64 binaries reported the exact tagged commit |
 | the-sarge/ras | Binary | Publisher designed, never run — needs first verified release |
 | GridSwarm/wiremux | Binary | Publishing works; over-spec relative to policy; simplify opportunistically, don't rewrite |
 | GridSwarm/codemux | Library | Compliant (manual) |
