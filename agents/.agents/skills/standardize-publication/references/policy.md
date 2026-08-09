@@ -50,7 +50,7 @@ For repos whose artifacts are themselves security infrastructure (today: cpace o
 | GridSwarm/wiremux | Binary | Publishing works; over-spec relative to policy; simplify opportunistically, don't rewrite |
 | GridSwarm/codemux | Library | Compliant (manual) |
 | GridSwarm/keymux | Library | No code yet; adopt at first release |
-| GridCastIO/gridcast | Binary | No publisher |
+| GridCastIO/gridcast | Binary | Compliant: first verified release v0.1.0 published 2026-08-08 (publisher green on first real run; RD5 four-cell clean-install matrix passed against the exact draft assets; evidence on GridCastIO/gridcast#279) |
 | SwarmCast/tapmux | Binary | Compliant (reference for Binary tier): publisher proven with v2.0.0-rc.3 (2026-08-05); v2.0.0 final pending readiness gates in SwarmCast/tapmux#428. Adoption lessons: keys must be step-scoped or gate fixtures break; aggregate local gate tasks must be decomposed in CI |
 | SwarmCast/swarmcast | Binary | Validation-only `release-check`; no publisher |
 | GrainBin/wellspring | Library | Manual releases; verify invariants on next release |
