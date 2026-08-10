@@ -18,7 +18,8 @@ cd ~/.dotfiles
 
 # 3. Stow the packages you want (or all of them)
 for pkg in bash zsh git ssh tmux helix nvim zellij smug \
-           starship broot btop ccstatusline gh ghostty; do
+           starship broot btop ccstatusline gh ghostty \
+           agents claude codex; do
   stow "$pkg"
 done
 ```
@@ -40,6 +41,9 @@ first (see `bin/migrate-config-to-stow.sh` for the pattern).
 | `ssh`        | `.ssh/config`                              |
 | `tmux`       | `.tmux.conf` (TPM plugins not tracked)     |
 | `nvim`       | `.viminfo` (legacy)                        |
+| `agents`     | `.agents/` (shared instructions)           |
+| `claude`     | `.claude/CLAUDE.md` (shared link)          |
+| `codex`      | `.codex/AGENTS.md` (shared link)           |
 
 ### Stowed under `~/.config/`
 
