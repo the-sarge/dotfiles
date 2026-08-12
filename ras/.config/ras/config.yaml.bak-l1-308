@@ -21,8 +21,8 @@ serve:
 agents:
   codex:
     preset: codex
-    model: gpt-5.6-sol
-    structured_delivery: native_only
+    model: gpt-5.4
+    structured_delivery: prompt_only
     # timeout_seconds overrides review.timeout_seconds for this agent.
     # timeout_seconds: 900
     # env adds process environment variables for this agent.
@@ -33,68 +33,63 @@ agents:
     model: gpt-5.6-sol
     reasoning_effort_control: codex_config
     reasoning_effort: high
-    structured_delivery: native_only
+    structured_delivery: prompt_only
   luna-max:
     preset: codex
     model: gpt-5.6-luna
     reasoning_effort_control: codex_config
     reasoning_effort: max
-    structured_delivery: native_only
+    structured_delivery: prompt_only
   claude-opus:
-    preset: claude
+    type: subprocess
+    command: ["claude", "--model", "{model}", "--effort", "high", "--permission-mode", "bypassPermissions", "-p"]
     model: opus
-    structured_delivery: native_only
     # timeout_seconds: 900
   claude-fable:
-    preset: claude
+    type: subprocess
+    command: ["claude", "--model", "{model}", "--effort", "high", "--permission-mode", "bypassPermissions", "-p"]
     model: fable
-    structured_delivery: native_only
     # timeout_seconds: 900
   agy-flash:
-    preset: agy-ras
+    type: subprocess
+    command: ["agy-ras", "--ras-stdin", "--dangerously-skip-permissions", "--print-timeout", "15m", "--model", "{model}"]
     model: gemini-3.6-flash-high
-    structured_delivery: native_only
     # timeout_seconds: 900
   agy-pro:
-    preset: agy-ras
+    type: subprocess
+    command: ["agy-ras", "--ras-stdin", "--dangerously-skip-permissions", "--print-timeout", "15m", "--model", "{model}"]
     model: gemini-3.1-pro-high
-    structured_delivery: native_only
     # timeout_seconds: 900
   grok:
-    preset: grok
+    type: subprocess
+    command: ["grok", "--always-approve", "--effort", "high", "-m", "{model}", "--prompt-file", "/dev/stdin"]
     model: grok-4.5
-    structured_delivery: native_only
     # timeout_seconds: 900
   grok-composer:
-    preset: grok
+    type: subprocess
+    command: ["grok", "--always-approve", "-m", "{model}", "--prompt-file", "/dev/stdin"]
     model: grok-composer-2.5
-    structured_delivery: native_only
     # timeout_seconds: 900
   cursor-composer:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: composer-2.5
-    structured_delivery: prompt_only
   cursor-gpt:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: gpt-5.5-extra-high
-    structured_delivery: prompt_only
   cursor-opus:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: claude-opus-4-8-thinking-xhigh
-    structured_delivery: prompt_only
   cursor-fable:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: claude-fable-5-thinking-high
-    structured_delivery: prompt_only
   cursor-grok:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: grok-4.5-xhigh
-    structured_delivery: prompt_only
 #   cursor-grok-build:
 #     type: subprocess
 #     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
@@ -103,17 +98,14 @@ agents:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: gemini-3.5-flash
-    structured_delivery: prompt_only
   cursor-gemini-pro:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: gemini-3.1-pro
-    structured_delivery: prompt_only
   cursor-glm:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: glm-5.2-high
-    structured_delivery: prompt_only
 
 
 # -------------
