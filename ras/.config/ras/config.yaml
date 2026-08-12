@@ -43,7 +43,7 @@ agents:
   claude-opus:
     preset: claude
     model: opus
-    structured_delivery: native_only
+    structured_delivery: prompt_only
     # timeout_seconds: 900
   claude-fable:
     preset: claude
