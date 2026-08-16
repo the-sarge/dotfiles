@@ -106,25 +106,3 @@ export PATH="$HOME/.grok/bin:$PATH"
 fpath=(~/.grok/completions/zsh $fpath)
 autoload -Uz compinit && compinit -C
 # <<< grok installer <<<
-
-# conda, guarded so this file stays shareable. mba13m4 is currently the only
-# machine with anaconda3 installed; the block below is what `conda init` wrote
-# there, wrapped so it is a no-op everywhere else. Without the guard, the
-# installer's own fallback branch prepends /Users/josh/anaconda3/bin to PATH
-# unconditionally, including on machines where that directory does not exist.
-if [[ -d "$HOME/anaconda3" ]]; then
-	# >>> conda initialize >>>
-	# !! Contents within this block are managed by 'conda init' !!
-	__conda_setup="$('/Users/josh/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-	if [ $? -eq 0 ]; then
-	    eval "$__conda_setup"
-	else
-	    if [ -f "/Users/josh/anaconda3/etc/profile.d/conda.sh" ]; then
-	        . "/Users/josh/anaconda3/etc/profile.d/conda.sh"
-	    else
-	        export PATH="/Users/josh/anaconda3/bin:$PATH"
-	    fi
-	fi
-	unset __conda_setup
-	# <<< conda initialize <<<
-fi
