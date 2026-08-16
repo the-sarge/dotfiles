@@ -31,30 +31,30 @@ fi
 
 # PATH (Homebrew is set up earlier by .zprofile via `brew shellenv`,
 # which exports HOMEBREW_PREFIX/PATH/etc. We append/prepend per-tool here.)
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="/usr/local/sbin:$PATH"
+path=("$HOME/.local/bin" $path)
+path=(/usr/local/sbin $path)
 
 # Go
-export PATH="$PATH:/usr/local/go/bin"
+path=($path /usr/local/go/bin)
 if command -v go >/dev/null 2>&1; then
-	export PATH="$PATH:$(go env GOPATH)/bin"
+	path=($path "$(go env GOPATH)/bin")
 fi
 
 # LM Studio CLI (lms)
-export PATH="$PATH:$HOME/.lmstudio/bin"
+path=($path "$HOME/.lmstudio/bin")
 
 # opencode
-export PATH="$PATH:$HOME/.opencode/bin"
+path=($path "$HOME/.opencode/bin")
 
 # Antigravity
-export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+path=("$HOME/.antigravity/antigravity/bin" $path)
 
 # Antigravity IDE
-export PATH="/Users/josh/.antigravity-ide/antigravity-ide/bin:$PATH"
+path=("$HOME/.antigravity-ide/antigravity-ide/bin" $path)
 
 # gcloud-cli (installed via `brew install --cask google-cloud-sdk`)
 if [ -n "${HOMEBREW_PREFIX:-}" ] && [ -d "$HOMEBREW_PREFIX/share/google-cloud-sdk/bin" ]; then
-	export PATH="$HOMEBREW_PREFIX/share/google-cloud-sdk/bin:$PATH"
+	path=("$HOMEBREW_PREFIX/share/google-cloud-sdk/bin" $path)
 fi
 
 # mamacli - granola
