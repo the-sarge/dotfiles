@@ -52,7 +52,7 @@ agents:
     # timeout_seconds: 900
   agy-flash:
     preset: agy-ras
-    model: gemini-3.6-flash-high
+    model: gemini-3.7-flash-high
     structured_delivery: native_only
     # timeout_seconds: 900
   agy-pro:
@@ -62,14 +62,14 @@ agents:
     # timeout_seconds: 900
   grok:
     preset: grok
-    model: grok-4.5
+    model: grok-4.6
     structured_delivery: native_only
     # timeout_seconds: 900
-  grok-composer:
-    preset: grok
-    model: grok-composer-2.5
-    structured_delivery: native_only
-    # timeout_seconds: 900
+#   grok-composer:
+#     preset: grok
+#     model: grok-composer-2.5
+#     structured_delivery: native_only
+#     # timeout_seconds: 900
   cursor-composer:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
@@ -93,7 +93,12 @@ agents:
   cursor-grok:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
-    model: grok-4.5-xhigh
+    model: cursor-grok-4.6-high
+    structured_delivery: prompt_only
+  cursor-grok-fast:
+    type: subprocess
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
+    model: cursor-grok-4.6-medium-fast
     structured_delivery: prompt_only
 #   cursor-grok-build:
 #     type: subprocess
@@ -102,7 +107,7 @@ agents:
   cursor-gemini-flash:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
-    model: gemini-3.5-flash
+    model: gemini-3.6-flash
     structured_delivery: prompt_only
   cursor-gemini-pro:
     type: subprocess
@@ -114,7 +119,11 @@ agents:
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
     model: glm-5.2-high
     structured_delivery: prompt_only
-
+  cursor-kimik3:
+    type: subprocess
+    command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
+    model: kimi-k3-max
+    structured_delivery: prompt_only
 
 # -------------
 # AGENT ROLES
@@ -157,26 +166,30 @@ model_profiles:
 #       - name: claude-fable
 #       - name: agy-flash  # SSH token guarded by agy-ras lock/repair wrapper
 #       - name: agy-pro    # after agy-flash; agy-ras serializes agy sessions for token safety
-      - name: grok
+#       - name: grok
 #       - name: grok-composer
-      - name: cursor-composer
-#       - name: cursor-grok
+#       - name: cursor-composer
+      - name: cursor-grok
 #       - name: cursor-opus
       # - name: cursor-fable
-#       - name: cursor-glm      
+#       - name: cursor-glm    
+#       - name: cursor-kimik3      
   fast-review:
     agents:
-#       - name: agy-flash
+      - name: agy-flash
       - name: cursor-composer
       - name: grok
   deep-review:
     agents:
       - name: codex-sol
       - name: luna-max
+      - name: claude-opus
       - name: claude-fable
 #         model: fable
       - name: grok
       - name: cursor-composer
+      - name: cursor-kimik3
+      - name: agy-pro
 #     synthesis:
 #       agent: codex
 #       model: gpt-5.5
