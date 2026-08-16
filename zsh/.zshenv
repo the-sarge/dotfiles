@@ -40,15 +40,24 @@ done
 if [[ -n "$_infra_root" ]]; then
 	export LIMA_HOME="$_infra_root/infra/lima"
 	export GARM_LOCAL_PROVIDER_TART_HOME="$_infra_root/infra/tart-garm"
-else
-	# Fail closed. These are external USB drives that sometimes drop; leaving
-	# the variables unset would make lima silently fall back to ~/.lima and
-	# rebuild VMs on the boot disk, which is exactly what moving them off it
-	# was meant to prevent. Point at a sentinel that cannot exist instead:
+elif [[ -f "$HOME/.config/infra-volume-host" ]]; then
+	# Fail closed, but only on machines that declare they keep VM data on an
+	# infra volume. Those are external USB drives that sometimes drop, and
+	# leaving the variables unset would make lima silently fall back to
+	# ~/.lima and rebuild VMs on the boot disk -- exactly what moving them off
+	# it was meant to prevent. Point at a sentinel that cannot exist instead:
 	# /Volumes is root-owned 0755, so nothing can be created there and any
 	# lima/tart command fails immediately with a path that names the problem.
 	export LIMA_HOME=/Volumes/infra-volume-not-mounted/lima
 	export GARM_LOCAL_PROVIDER_TART_HOME=/Volumes/infra-volume-not-mounted/tart-garm
 	[[ -o interactive ]] && print -u2 "warning: no infra volume mounted (checked lab-2TB, infra-2TB); LIMA_HOME/GARM_LOCAL_PROVIDER_TART_HOME point at an absent path so nothing lands on the boot disk"
 fi
+# No marker and no volume: leave both unset so lima uses its own ~/.lima
+# default. m1mini and imacpro (pre-migration) genuinely keep VMs there, and
+# fail-closing would hide gigabytes of existing images from limactl.
+#
+# The marker is an empty file, deliberately untracked and machine-local:
+#   touch ~/.config/infra-volume-host
+# Create it on a host once its VM data actually lives on an infra volume --
+# for imacpro, as the last step of the-sarge/infra#203.
 unset _infra_root _infra_candidate
