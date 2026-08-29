@@ -166,7 +166,7 @@ model_profiles:
 #       - name: claude-fable
 #       - name: agy-flash  # SSH token guarded by agy-ras lock/repair wrapper
 #       - name: agy-pro    # after agy-flash; agy-ras serializes agy sessions for token safety
-#       - name: grok
+      - name: grok
 #       - name: grok-composer
 #       - name: cursor-composer
       - name: cursor-grok
