@@ -51,13 +51,11 @@ agents:
     model: fable
     # timeout_seconds: 900
   agy-flash:
-    type: subprocess
-    command: ["agy-ras", "--ras-stdin", "--dangerously-skip-permissions", "--print-timeout", "15m", "--model", "{model}"]
+    preset: agy
     model: gemini-3.6-flash-high
     # timeout_seconds: 900
   agy-pro:
-    type: subprocess
-    command: ["agy-ras", "--ras-stdin", "--dangerously-skip-permissions", "--print-timeout", "15m", "--model", "{model}"]
+    preset: agy
     model: gemini-3.1-pro-high
     # timeout_seconds: 900
   grok:
@@ -147,8 +145,8 @@ model_profiles:
 #       - name: luna-max
       - name: claude-opus
 #       - name: claude-fable
-#       - name: agy-flash  # SSH token guarded by agy-ras lock/repair wrapper
-#       - name: agy-pro    # after agy-flash; agy-ras serializes agy sessions for token safety
+#       - name: agy-flash
+#       - name: agy-pro
       - name: grok
 #       - name: grok-composer
       - name: cursor-composer
