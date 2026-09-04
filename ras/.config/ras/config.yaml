@@ -51,12 +51,12 @@ agents:
     structured_delivery: native_only
     # timeout_seconds: 900
   agy-flash:
-    preset: agy-ras
+    preset: agy
     model: gemini-3.7-flash-high
     structured_delivery: native_only
     # timeout_seconds: 900
   agy-pro:
-    preset: agy-ras
+    preset: agy
     model: gemini-3.1-pro-high
     structured_delivery: native_only
     # timeout_seconds: 900
@@ -164,8 +164,8 @@ model_profiles:
 #       - name: luna-max
       - name: claude-opus
 #       - name: claude-fable
-#       - name: agy-flash  # SSH token guarded by agy-ras lock/repair wrapper
-#       - name: agy-pro    # after agy-flash; agy-ras serializes agy sessions for token safety
+#       - name: agy-flash
+#       - name: agy-pro
       - name: grok
 #       - name: grok-composer
 #       - name: cursor-composer
