@@ -22,7 +22,7 @@ serve:
 agents:
   codex:
     preset: codex
-    model: gpt-5.6-sol
+    model: gpt-6.1-sol
     structured_delivery: native_only
     # timeout_seconds overrides review.timeout_seconds for this agent.
     # timeout_seconds: 900
@@ -37,13 +37,13 @@ agents:
     structured_delivery: native_only
   codex-sol:
     preset: codex
-    model: gpt-5.6-sol
+    model: gpt-6.1-sol
     reasoning_effort_control: codex_config
     reasoning_effort: high
     structured_delivery: native_only
   luna-max:
     preset: codex
-    model: gpt-5.6-luna
+    model: gpt-6-luna
     reasoning_effort_control: codex_config
     reasoning_effort: max
     structured_delivery: native_only
@@ -105,12 +105,12 @@ agents:
   cursor-grok:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
-    model: cursor-grok-4.6-high
+    model: cursor-grok-4.7-high
     structured_delivery: prompt_only
   cursor-grok-fast:
     type: subprocess
     command: ["cursor-agent", "--trust", "--yolo", "--model", "{model}", "-p"]
-    model: cursor-grok-4.6-medium-fast
+    model: cursor-grok-4.7-medium-fast
     structured_delivery: prompt_only
 #   cursor-grok-build:
 #     type: subprocess
@@ -151,7 +151,7 @@ builder:
   #   command: ["cursor-agent", "--print", "--trust", "--yolo", "--model", "{model}"]
   #   model: composer-2.5-fast
   command: ["codex", "exec", "--sandbox", "danger-full-access", "--dangerously-bypass-approvals-and-sandbox", "-"]
-  model: gpt-5.6-sol
+  model: gpt-6.1-sol
   #   command: ["/Users/josh/.local/bin/claude-p", "--permission-mode", "bypassPermissions"]
   #   command: ["grok", "--prompt-file", "/dev/stdin", "--always-approve", "--effort", "xhigh", "-m", "grok-composer-2.5-fast"]
   timeout: 60m
@@ -192,7 +192,7 @@ model_profiles:
 #       - name: cursor-opus
       # - name: cursor-fable
 #       - name: cursor-glm    
-      - name: cursor-kimik3
+#       - name: cursor-kimik3
 #       - name: cursor-muse      
   fast-review:
     agents:
