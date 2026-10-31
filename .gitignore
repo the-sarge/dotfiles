@@ -14,3 +14,9 @@ conda/
 /ras/.config/ras/ras.sqlite
 /ras/.config/ras/config.yaml.bak
 worktrees/
+
+# Local SQLite databases (and WAL/SHM/journal sidecars) created by tools inside stowed dirs.
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
