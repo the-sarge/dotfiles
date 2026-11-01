@@ -20,3 +20,10 @@
 - Never switch branches, move branch refs, reset, or clean another agent's worktree. Reuse an existing worktree only when the user explicitly directs it or the active workflow already owns it.
 - Do not commit directly to the default branch.
 - Do not push directly to the default branch unless the user explicitly asks for a merge or direct push.
+
+## GitHub issue and pull request references
+
+- Always include the issue or PR number in every user-facing reference to a GitHub issue or pull request, including commentary, final answers, tables, summaries and tracker updates.
+- Put the number in the visible text, not only in the URL. Prefer `[Descriptive issue title (#1644)](url)` or `[PR #42 — Descriptive title](url)`.
+- Keep descriptive titles when a skill asks for references by name, and include the number alongside the title. Never omit the number to satisfy a name-based reference convention.
+- Before sending, check that every GitHub issue and PR reference visibly includes its number.
