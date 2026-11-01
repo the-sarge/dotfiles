@@ -21,6 +21,14 @@
 - Do not commit directly to the default branch.
 - Do not push directly to the default branch unless the user explicitly asks for a merge or direct push.
 
+## Other
+
+- Never narrow the RAS panel without permission.
+- End every stop with a recommendation.
+- Don’t create new gates or budgets without good reason.
+- Update OmniFocus on every issue change.
+- Busy hosts are normal. Differentiate between background activity on efficiency cores versus performance cores.
+
 ## GitHub issue and pull request references
 
 - Always include the issue or PR number in every user-facing reference to a GitHub issue or pull request, including commentary, final answers, tables, summaries and tracker updates.

@@ -55,7 +55,7 @@ agents:
   claude-opus:
     preset: claude
     model: opus
-    structured_delivery: prompt_only
+    structured_delivery: native_only
     # timeout_seconds: 900
   claude-sonnet:
     preset: claude
@@ -67,14 +67,14 @@ agents:
     model: gemini-3.8-flash-high
     structured_delivery: native_only
     # timeout_seconds: 900
-  agy-pro:
+  agy-argon:
     preset: agy
-    model: gemini-3.1-pro-high
+    model: gemini-4-argon-high
     structured_delivery: native_only
     # timeout_seconds: 900
   grok:
     preset: grok
-    model: grok-4.5
+    model: grok-4.7
     structured_delivery: native_only
     # timeout_seconds: 900
 #   grok-composer:
@@ -161,11 +161,11 @@ builder:
 
 # Agent used to synthesize the final review after reviewer/adjudication rounds.
 synthesis:
-  agent: codex-sol
+  agent: codex-astra
 
 # Agent used to score experiment cells. If unset, ras uses synthesis.agent.
 evaluation:
-  agent: codex-sol
+  agent: codex-astra
 
 
 # ------------------------
@@ -184,8 +184,8 @@ model_profiles:
       - name: claude-opus
 #       - name: claude-sonnet
 #       - name: agy-flash
-#       - name: agy-pro
-      - name: grok
+#       - name: agy-argon
+#       - name: grok
 #       - name: grok-composer
 #       - name: cursor-composer
 #       - name: cursor-grok
@@ -210,7 +210,7 @@ model_profiles:
       - name: grok
 #       - name: cursor-composer
       - name: cursor-kimik3
-      - name: agy-pro
+      - name: agy-argon
 #     synthesis:
 #       agent: codex
 #       model: gpt-5.5
@@ -227,6 +227,7 @@ model_profiles:
       - name: claude-fable
       - name: claude-opus
       - name: grok
+      - name: agy-argon
 
 #--------------------------
 # PIPELINE CONFIGURATIONS
