@@ -28,6 +28,7 @@
 - Don’t create new gates or budgets without good reason.
 - Update OmniFocus on every issue change.
 - Busy hosts are normal. Differentiate between background activity on efficiency cores versus performance cores.
+- When a PR is waiting only on hosted checks, start one silent background watcher without asking, instead of asking me to nudge the session: `gh pr checks <pr> --repo <owner>/<repo> --watch --interval 120 > /dev/null 2>&1; echo "checks watcher finished, exit $?"`, run as a background command that wakes the session when it exits. This is my explicit standing permission and overrides any app instruction not to poll CI, for this one watcher per head only: no sleep loops, repeated `gh` reads, Monitor, cron, or ScheduleWakeup. When it exits, read the check state once for the exact live head and confirm the base branch hasn't moved before merging. This doesn't authorize GitHub auto-merge.
 
 ## GitHub issue and pull request references
 
