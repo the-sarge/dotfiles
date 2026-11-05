@@ -55,5 +55,6 @@ For repos whose artifacts are themselves security infrastructure (today: cpace o
 | SwarmCast/tapmux | Binary | Compliant (reference for Binary tier): publisher proven with v2.0.0-rc.3 (2026-08-05); v2.0.0 final pending readiness gates in SwarmCast/tapmux#428. Adoption lessons: keys must be step-scoped or gate fixtures break; aggregate local gate tasks must be decomposed in CI |
 | SwarmCast/swarmcast | Binary | Validation-only `release-check`; no publisher |
 | GrainBin/wellspring | Library | Manual releases; verify invariants on next release |
+| GrainBin/raptorq-go | Library | Compliant (manual): first release v0.1.0 published 2026-09-30 at `8c30e67`; `task check` + SIMD tests green at the tagged commit, `--verify-tag` re-create refused, clean-cache `go list -m` resolved the tag. Lesson: the docs-only CI shortcut means post-code-change commits never get a full CI run, so notes must say where linux CI last ran |
 | GrainBin/offload | Binary | No publisher |
 | GrainBin/archive-simulator | Binary (future) | Validation-only `release-check`; adopt when it ships binaries |
