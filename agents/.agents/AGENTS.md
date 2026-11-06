@@ -14,7 +14,8 @@
 - Read-only agents may share a checkout only when they use pinned commit SHAs and do not switch branches or mutate repository state.
 - If currently on `main`, `master`, `trunk`, or the repo default branch, create a feature branch before editing.
 - Prefix branch names with the name of the agent creating the branch, such as `claude/<short-task-slug>`, `codex/<short-task-slug>` or `grok/<short-task-slug>`, unless the user gives a branch name.
-- Create worktrees only under `/Volumes/worktrees/<repo>/<short-task-slug>`. Never create them as siblings of the repository, inside the repository (`.worktrees` or `.git-worktrees`), or in temporary directories.
+- Create worktrees only under `/Volumes/worktrees/<short-task-slug>/<repo>`. Never create them as siblings of the repository, inside the repository (`.worktrees` or `.git-worktrees`), or in temporary directories.
+- Keep app-managed worktrees at the paths returned by the app; never move or rename them after attachment to a chat.
 - Before editing and immediately before committing, verify the worktree path, branch, HEAD, and cleanliness. Stop if unexpected changes are detected.
 - Treat existing uncommitted changes as user-owned. Do not move, revert, stash, or overwrite them without explicit instruction.
 - Never switch branches, move branch refs, reset, or clean another agent's worktree. Reuse an existing worktree only when the user explicitly directs it or the active workflow already owns it.
