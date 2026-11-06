@@ -28,6 +28,10 @@ Stow will refuse if a target file already exists and isn't owned by stow.
 Resolve by either deleting the existing file or moving it into the package
 first (see `bin/migrate-config-to-stow.sh` for the pattern).
 
+## Canonical agent skills
+
+Skills maintained in `the-sarge/skills` are linked from `agents/.agents/skills/` to `~/code/github.com/the-sarge/skills/`, including `_shared`. Clone that repository at this path before using the stowed skills, and keep its checkout current. The relative links assume this dotfiles checkout is at `~/.dotfiles`; they may be unresolved inside a development worktree. Edit shared skills in the skills repository. Skills that exist only in dotfiles remain ordinary directories here.
+
 ## Packages
 
 ### Stowed into `$HOME` directly

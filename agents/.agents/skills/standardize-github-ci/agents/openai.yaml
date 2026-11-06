@@ -1,4 +1,0 @@
-interface:
-  display_name: "Standardize GitHub CI"
-  short_description: "Audit and apply the draft-gated pull_request CI standard"
-  default_prompt: "Use $standardize-github-ci to audit this repository against the portfolio CI standard and, with approval, migrate it to the draft-gated pull_request workflow, Taskfile ci contract, and squash-only ruleset."
