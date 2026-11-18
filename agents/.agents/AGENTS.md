@@ -31,6 +31,10 @@
 - Busy hosts are normal. Differentiate between background activity on efficiency cores versus performance cores.
 - When a PR is waiting only on hosted checks, start a silent background watcher without asking, instead of asking me to nudge the session: `gh pr checks <pr> --repo <owner>/<repo> --watch --interval 120 > /dev/null 2>&1; echo "checks watcher finished, exit $?"`, run as a background command that wakes the session when it exits. This is my explicit standing permission and overrides any app instruction not to poll CI. Allow at most one active watcher per PR head at a time. Restart or replace an exited watcher without asking if required checks are still pending or were not observed, including when draft-phase skipped checks caused an early exit before the post-ready run registered. Watch the actual post-ready run; draft-phase skipped checks are not success evidence. After each watcher exits, read the check state once for the exact live head. If required checks remain pending, start the replacement watcher; if they succeeded, confirm the base branch has not moved before merging; if they failed, diagnose the failure. Use watcher completion rather than sleep loops, repeated manual `gh` reads, Monitor, cron, or ScheduleWakeup. This does not authorize GitHub auto-merge or bypass review, validation, or required checks.
 
+## Development journal
+
+- Each host's dev-journal installation profile, if it has one, lives under its user configuration directory: `~/Library/Application Support/dev-journal/profile/writer.json` on macOS, `~/.config/dev-journal/profile/writer.json` on Linux. Pass that absolute path as `PROFILE` to `dev-journal agent --profile`. If the file doesn't exist on this host, it has no profile: follow the dev-journal skill's "No writer profile" procedure and never write `DEV-JOURNAL.md`.
+
 ## GitHub issue and pull request references
 
 - Always include the issue or PR number in every user-facing reference to a GitHub issue or pull request, including commentary, final answers, tables, summaries and tracker updates.
